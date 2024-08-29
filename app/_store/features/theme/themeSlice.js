@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-  value: true,
+  darkMode: true,
 }
 
 export const themeSlice = createSlice({
@@ -9,7 +9,7 @@ export const themeSlice = createSlice({
   initialState,
   reducers: {
     changeTheme: (state) =>{
-        state = !state;
+        state.darkMode = !state.darkMode;
     }
   },
 })
