@@ -1,26 +1,41 @@
 'use client';
 
+import { useRouter } from "next/navigation";
 import Card from "../_components/NoteCard"
-import { changeTheme } from "../_store/features/theme/themeSlice";
+// import { changeTheme } from "../_store/features/theme/themeSlice";
 import { useAppDispatch, useAppSelector } from "../_store/hooks";
+
+// import sql from "@/server/db/db";
+import { useEffect } from "react";
+import { setUserId } from "../_store/features/user/userIdSlice";
+// import e from "express";
 
 
 function Home() {
   const theme = useAppSelector(state => state.theme.darkMode);
+
   const dispatch = useAppDispatch();
-  console.log(theme)
+  const route = useRouter();
+
+  const id = 3;
+
+  const setUser = (userID) => {
+    dispatch(setUserId(userID));
+  }
+
+  useEffect(() => {
+    fetch("http://localhost:3000/home/")
+    .then(res => res.json())
+    .then(data => console.log(data))
+    .catch(err => console.log(err))
+    setUser(id);
+
+  },[])
+
+
   return (
     <div className="dark h-screen ">
-      <div className="dark:bg-[#0c0c0c] h-full  bg-orange-100 dark:text-white text-black p-10">
-          <div className="lg:grid-cols-4 md:grid-cols-3 grid-cols-2 grid gap-y-5">
-          <Card/>
-          <Card/>
-          <Card/>
-          <Card/>
-          <Card/>
-          </div>
-      </div>
-      <button className="text-white" onClick={()=> dispatch(changeTheme())}> click me</button>
+      Home Page
     </div>
   )
 }

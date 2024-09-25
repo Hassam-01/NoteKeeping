@@ -7,3 +7,29 @@
     @apply text-lg flex items-center gap-x-3 px-4 py-2 w-full hover:bg-gray-200 dark:hover:bg-[#2A2A2A] rounded-lg transition-colors cursor-pointer;
   }
   
+  .modal-content {
+    position: fixed;
+    /* background: white; */
+    /* border-radius: 10px; */
+    /* padding: 20px; */
+    /* width: 900px; */
+    /* margin: 0 auto; */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    outline: none;
+  }
+  
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.75); /* Shadowed background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  

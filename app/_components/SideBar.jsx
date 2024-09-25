@@ -1,3 +1,4 @@
+'use client';
 import Image from "next/image";
 
 // * profile image
@@ -10,10 +11,16 @@ import { IoArchiveOutline } from "react-icons/io5";
 import { BsPeople } from "react-icons/bs";
 import { IoSettingsOutline } from "react-icons/io5";
 import { FaPowerOff } from "react-icons/fa6";
+import { useRouter } from "next/navigation";
+import { useAppSelector } from "../_store/hooks";
+
 
 function SideBar() {
+
+const route = useRouter();
+const userID = useAppSelector(state => state.userId.userID);
   return (
-    <div className="dark h-full flex flex-col justify-between">
+    <div className="dark h-full md:flex md:flex-col md:justify-between hidden">
       <div className="dark:bg-[#1E201E] bg-orange-100 p-5 flex flex-col text-center h-full w-full items-center dark:text-[#F39F5A] text-gray-700">
         {/* Account Section */}
         <div className="account mt-10 flex flex-col items-center">
@@ -36,19 +43,19 @@ function SideBar() {
           
           <div className="side-bar-labels">
             <CgNotes />
-            <p>Notes</p>
+            <p onClick={()=> route.push(`/home/${userID}/notes`)}>Notes</p>
           </div>
           <div className="side-bar-labels">
             <FaRegBell />
-            <p>Reminders</p>
+            <p onClick={()=> route.push(`/home/${userID}/reminders`)}>Reminders</p>
           </div>
           <div className="side-bar-labels">
             <IoArchiveOutline />
-            <p>Archives</p>
+            <p onClick={()=> route.push(`/home/${userID}/archives`)}>Archives</p>
           </div>
           <div className="side-bar-labels">
             <BsPeople />
-            <p>Space</p>
+            <p onClick={()=> route.push(`/home/${userID}/space`)}>Space</p>
           </div>
         </div>
         {/* Settings Section */}
