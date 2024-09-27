@@ -71,33 +71,68 @@ app.get('/home/:id/notes/', async (req, res) => {
     }
   });
   
-app.put('/home/:id/notes/:notesId', async (req, res) => {
+app.all('/home/:id/notes/:notesId', async (req, res) => {
+    const id = req.params.id;
+    const notesId = req.params.notesId;
+
     try {
-        const id = req.params.id;
-        const notesId = req.params.notesId;
-        const { title, text } = req.body;
-        
-        // Update the note in the database
-        const updatedRows = await db('notes')
-            .where({
-                note_id: notesId
-            })
-            .update({
-                title: title,
-                text: text
-            });
-            
+        if (req.method === 'PUT') {
+            const { title, text } = req.body;
+
+            // Update the note in the database
+            const updatedRows = await db('notes')
+                .where({
+                    note_id: notesId
+                })
+                .update({
+                    title: title,
+                    text: text
+                });
+
             if (updatedRows === 0) {
                 return res.status(404).json({ message: 'Note not found' });
             }
-        res.status(200).json({ message: 'Note updated successfully' });
+
+            res.status(200).json({ message: 'Note updated successfully' });
+
+        } else if (req.method === 'DELETE') {
+            // Delete the note from the database
+            const deletedRows = await db('notes')
+                .where({
+                    note_id: notesId
+                })
+                .del();
+
+            if (deletedRows === 0) {
+                return res.status(404).json({ message: 'Note not found' });
+            }
+
+            res.status(200).json({ message: 'Note deleted successfully' });
+        } else {
+            res.status(405).json({ message: 'Method not allowed' });
+        }
+
     } catch (err) {
-        console.error('Error updating note:', err);
+        console.error('Error handling request:', err);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
 
 
+app.post('/home/:id/notes/post', async (req, res)=>{
+    const {title, text} = req.body;
+    try {
+        const newNote = await db('notes').insert({
+            title: title,
+            text: text,
+            user_id: req.params.id
+        });
+        res.status(200).json({message: 'Note created successfully'});
+    } catch (error) {
+        console.error('Error creating note:', error);
+        res.status(500).json({message: 'Internal Server Error'});
+    }
+})
 
 //  * listening 
 app.listen(3009, () => {

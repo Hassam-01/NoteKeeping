@@ -6,6 +6,7 @@ import { RiDeleteBin5Line } from "react-icons/ri";
 import { IoArchiveOutline } from "react-icons/io5";
 import Modal from "react-modal";
 import { useAppSelector } from "../_store/hooks";
+import { on } from "@/server/db";
 
 if (typeof window !== "undefined") {
   Modal.setAppElement(document.body);
@@ -31,8 +32,19 @@ function NoteCard({ title, initialBody, date, noteId }) {
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
+    if(!toggleExpand){
+      onSubmit();  
+    }
   };
-
+  const handleDelete = () =>{
+    fetch(`http://localhost:3009/home/${id}/notes/${noteId}`, {
+      method: "DELETE",
+    })
+      .then((res) => res.json())
+      .then((data) => console.log(data))
+      .catch((err) => console.log(err));
+  }
+  const handleArchive = () =>{}
   // const id = useAppSelector(state => state.userId.userID);
   const id = 3;
 
@@ -96,10 +108,10 @@ function NoteCard({ title, initialBody, date, noteId }) {
               <h3 className="text-lg font-semibold ">{title}</h3>
               <div className="flex gap-2">
                 <div className="border-2 border-red-600 rounded-full flex items-center text-center p-2">
-                  <RiDeleteBin5Line className="text-red-600" />
+                  <RiDeleteBin5Line className="text-red-600 dark:hover:bg-[#2A2A2A] rounded-full" onClick={handleDelete} />
                 </div>
                 <div className="border-2 border-green-700 rounded-full flex items-center text-center p-2">
-                  <IoArchiveOutline className="text-green-700" />
+                  <IoArchiveOutline className="text-green-700 dark:hover:bg-[#2A2A2A] rounded-full" onClick={handleArchive}/>
                 </div>
               </div>
             </div>

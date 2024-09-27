@@ -6,6 +6,10 @@
 .side-bar-labels {
     @apply text-lg flex items-center gap-x-3 px-4 py-2 w-full hover:bg-gray-200 dark:hover:bg-[#2A2A2A] rounded-lg transition-colors cursor-pointer;
   }
+
+  .edit-tools{
+    @apply h-10 w-10 text-[#F39F5A] hover:bg-gray-200 dark:hover:bg-[#2A2A2A] rounded-full p-1 cursor-pointer;
+  }
   
   .modal-content {
     position: fixed;
