@@ -1,5 +1,4 @@
 'use client';
-import { useAppSelector } from "@/app/_store/hooks";
 import { useEffect } from "react"
 
 function page() {

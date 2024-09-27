@@ -1,14 +1,14 @@
 "use client";
-import { setNotes } from "@/app/_store/features/notes/noteSlice";
+import { setNotes } from "../../../_store/features/notes/noteSlice";
 import { IoIosAddCircleOutline } from "react-icons/io";
 import { MdOutlineDraw } from "react-icons/md";
 import { Spinner } from "@material-tailwind/react";
 import Modal from "react-modal";
 
-import { useAppDispatch, useAppSelector } from "@/app/_store/hooks";
+import { useAppDispatch, useAppSelector } from "../../../_store/hooks";
 import { useEffect, useState } from "react";
 
-import Card from "@/app/_components/NoteCard";
+import Card from "../../../_components/NoteCard";
 
 function page() {
   //   const userID = useAppSelector((state) => state.userId.userID);

@@ -3,9 +3,10 @@ const express = require('express');
 const app = express();
 const db = require('./db/');
 const cors = require('cors');
+const bcrypt = require('bcrypt');
 
 
-
+const salt = 10;
 app.use(cors());
 app.use(express.json());
 // ! Routing to home page
@@ -133,6 +134,40 @@ app.post('/home/:id/notes/post', async (req, res)=>{
         res.status(500).json({message: 'Internal Server Error'});
     }
 })
+
+app.post('/register', async (req, res) => {
+    const { email, password, first_name, last_name } = req.body;
+
+    bcrypt.hash(password.to_String() , salt, (err, hash) => {
+        if(err) return res.status(500).json({message: 'Internal Server Error'});
+            const values = [
+                email,
+                hash,
+                first_name,
+                last_name
+            ];
+            db('users').insert({
+                email: email,
+                password: hash,
+                first_name: first_name,
+                last_name: last_name
+            }).then(() => {
+                res.status(200).json({message: 'User created successfully'});
+            }).catch((err) => {
+                console.error('Error creating user:', err);
+                res.status(500).json({message: 'Internal Server Error'});
+            });
+    })
+    try{
+        const user = await db('users').where({
+            email : email,
+            password : password
+        })
+    }catch(err){
+
+    }
+})
+
 
 //  * listening 
 app.listen(3009, () => {
