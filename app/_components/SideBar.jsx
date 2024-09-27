@@ -43,11 +43,11 @@ const userID = useAppSelector(state => state.userId.userID);
           
           <div className="side-bar-labels">
             <CgNotes />
-            <p onClick={()=> route.push(`/home/${userID}/notes`)}>Notes</p>
+            <p onClick={()=> route.push(`/${userID}/home/notes`)}>Notes</p>
           </div>
           <div className="side-bar-labels">
             <FaRegBell />
-            <p onClick={()=> route.push(`/home/${userID}/reminders`)}>Reminders</p>
+            <p onClick={()=> route.push(`/${userID}/home/reminders`)}>Reminders</p>
           </div>
           <div className="side-bar-labels">
             <IoArchiveOutline />
@@ -55,7 +55,7 @@ const userID = useAppSelector(state => state.userId.userID);
           </div>
           <div className="side-bar-labels">
             <BsPeople />
-            <p onClick={()=> route.push(`/home/${userID}/space`)}>Space</p>
+            <p onClick={()=> route.push(`/${userID}/home/space`)}>Space</p>
           </div>
         </div>
         {/* Settings Section */}

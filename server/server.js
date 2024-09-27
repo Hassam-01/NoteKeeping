@@ -137,37 +137,56 @@ app.post('/home/:id/notes/post', async (req, res)=>{
 
 app.post('/register', async (req, res) => {
     const { email, password, first_name, last_name } = req.body;
+    let userID;
+    bcrypt.hash(password.toString(), salt, async (err, hash) => {
+        if (err) return res.status(500).json({ message: 'Internal Server Error' });
 
-    bcrypt.hash(password.to_String() , salt, (err, hash) => {
-        if(err) return res.status(500).json({message: 'Internal Server Error'});
-            const values = [
-                email,
-                hash,
-                first_name,
-                last_name
-            ];
-            db('users').insert({
-                email: email,
-                password: hash,
+        try {
+            const insertedUsers = await db('users').insert({
                 first_name: first_name,
                 last_name: last_name
-            }).then(() => {
-                res.status(200).json({message: 'User created successfully'});
-            }).catch((err) => {
-                console.error('Error creating user:', err);
-                res.status(500).json({message: 'Internal Server Error'});
+            }).returning('id'); 
+            userID = insertedUsers[0].id;
+            
+            res.status(200).json({ message: 'User created successfully', userId: userID });
+        } catch (err) {
+            console.error('Error creating user:', err);
+            res.status(500).json({ message: 'Internal Server Error' });
+        }
+        try{
+            await db('authentication').insert({
+                email: email,
+                hash: hash,
+                userid: userID
             });
-    })
-    try{
-        const user = await db('users').where({
-            email : email,
-            password : password
-        })
-    }catch(err){
+        }catch(err){
+            await db.delete().from('account').where('user_id', userID);
+            await db.delete().from('users').where('id', userID);
+            console.error('Error creating user:', err);
+        }
+    });
+});
 
+app.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        const user = await db('authentication').where('email', email).first(); 
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        bcrypt.compare(password, user.hash, (err, result) => {
+            if (err) return res.status(500).json({ message: 'Internal Server Error' });
+            if (result) {
+                res.status(200).json({ message: 'Login successful', userId: user.userid });
+            } else {
+                res.status(401).json({ message: 'Incorrect password' });
+            }
+        });
+    } catch (err) {
+        console.error('Error logging in:', err);
+        res.status(500).json({ message: 'Internal Server Error' });
     }
-})
-
+});
 
 //  * listening 
 app.listen(3009, () => {

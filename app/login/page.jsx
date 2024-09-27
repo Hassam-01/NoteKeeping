@@ -1,24 +1,27 @@
 'use client';
+import axios from 'axios';
 import { useState } from 'react';
-
+import { useRouter } from 'next/navigation';
 const LoginPage = () => {
 
   const [values, setValues] = useState({
       email: '',
       password: ''
   });
+  const route = useRouter();
   const handleLogin = (e) => {
     e.preventDefault();
-    axios.get('http://localhost:3009/login', values)
-    .then(res=>console.log(res))
+    axios.post('http://localhost:3009/login', values)
+    .then(res=>{
+      if(res.status === 200){
+        route.push(`/${res.userId}/home/`);
+      }
+    })
     .then(err => console.log(err))
 
-    alert(`Logged in as ${email}`);
+
   };
 
-  const handleRegister = () => {
-    alert('Redirecting to Register Page...');
-  };
 
   return (
     <div className="dark flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-800 via-gray-900 to-black">
@@ -81,7 +84,7 @@ const LoginPage = () => {
             <span>
               New to NoteKeeping?{' '}
               <button
-                onClick={handleRegister}
+                onClick={()=> route.push('../register')}
                 className="text-xs text-[#F39F5A] hover:underline dark:hover:text-[#F3801B] transition"
               >
                 Register Here
