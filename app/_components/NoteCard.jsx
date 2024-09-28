@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { use, useState } from "react";
 import { useForm } from "react-hook-form"; // Import react-hook-form
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { IoArchiveOutline } from "react-icons/io5";
 import Modal from "react-modal";
+// import { cookies } from "next/headers";
 // import { useAppSelector } from "../_store/hooks";
 // import { on } from "@/server/db";
 
@@ -46,6 +47,7 @@ function NoteCard({ title, initialBody, date, noteId }) {
   }
   const handleArchive = () =>{}
   // const id = useAppSelector(state => state.userId.userID);
+  // const id = cookies().get('token')?.value;
   const id = 3;
 
   const formatDate = (dateString) => {

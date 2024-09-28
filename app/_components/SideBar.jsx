@@ -11,15 +11,30 @@ import { IoArchiveOutline } from "react-icons/io5";
 import { BsPeople } from "react-icons/bs";
 import { IoSettingsOutline } from "react-icons/io5";
 import { FaPowerOff } from "react-icons/fa6";
-import { useRouter } from "next/navigation";
-import { useAppSelector } from "../_store/hooks";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 
 function SideBar() {
+const [userID, setUserID] = useState(null);
+axios.defaults.withCredentials = true;
+useEffect(()=>{
+  axios.get('http://localhost:3009/')
+  .then(res=>{
+    if(res.status === 200){
+      console.log(res);
+      console.log(res.data.id, " id");
+      console.log(res.data.message, " message");
+      setUserID(res.data.id);
+    }
+  })
+  .catch(err=>console.log(err))
+},[])
 
 const route = useRouter();
-const userID = useAppSelector(state => state.userId.userID);
-  return (
+console.log(userID);
+return (
     <div className="dark h-full md:flex md:flex-col md:justify-between hidden">
       <div className="dark:bg-[#1E201E] bg-orange-100 p-5 flex flex-col text-center h-full w-full items-center dark:text-[#F39F5A] text-gray-700">
         {/* Account Section */}
@@ -43,8 +58,8 @@ const userID = useAppSelector(state => state.userId.userID);
           
           <div className="side-bar-labels">
             <CgNotes />
-            <p onClick={()=> route.push(`/${userID}/home/notes`)}>Notes</p>
-          </div>
+            <p onClick={() => route.push(`/${userID}/home/notes`)}>Notes</p>
+            </div>
           <div className="side-bar-labels">
             <FaRegBell />
             <p onClick={()=> route.push(`/${userID}/home/reminders`)}>Reminders</p>

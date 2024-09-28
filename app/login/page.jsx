@@ -2,19 +2,27 @@
 import axios from 'axios';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAppDispatch } from '../_store/hooks';
+import { setUserId } from '../_store/features/user/userIdSlice';
+
 const LoginPage = () => {
 
   const [values, setValues] = useState({
       email: '',
       password: ''
   });
+
+  const dispatch = useAppDispatch();
+
   const route = useRouter();
   const handleLogin = (e) => {
     e.preventDefault();
+    axios.defaults.withCredentials = true;
     axios.post('http://localhost:3009/login', values)
     .then(res=>{
       if(res.status === 200){
-        route.push(`/${res.userId}/home/`);
+        dispatch(setUserId(res.data.userId));
+        route.push(`/${res.data.userId}/home/`);
       }
     })
     .then(err => console.log(err))

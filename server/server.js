@@ -4,11 +4,43 @@ const app = express();
 const db = require('./db/');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv').config("../.env");
+const cookieParser = require('cookie-parser');
+
 
 
 const salt = 10;
-app.use(cors());
+app.use(cors(
+    {
+        origin : 'http://localhost:3000',
+        credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'DELETE']
+    }
+));
 app.use(express.json());
+app.use(cookieParser());
+
+const verifyUser = (req, res, next) => {
+    const token = req.cookies.token;
+    if (!token) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.userId = decoded.id;
+        next();
+    } catch (err) {
+        console.error('Error verifying token:', err);
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+};
+app.get('/', verifyUser, (req, res) => {
+    res.status(200).json({ message: 'Welcome to the home page', id: req.userId }); 
+  });
+
+
+
 // ! Routing to home page
 app.get('/homes', async (req, res) => {
     try {
@@ -177,6 +209,10 @@ app.post('/login', async (req, res) => {
         bcrypt.compare(password, user.hash, (err, result) => {
             if (err) return res.status(500).json({ message: 'Internal Server Error' });
             if (result) {
+                const id = user.userid;
+                const token = jwt.sign({id}, process.env.JWT_SECRET, {expiresIn: '20m'});
+
+                res.cookie('token', token , {httpOnly: true});
                 res.status(200).json({ message: 'Login successful', userId: user.userid });
             } else {
                 res.status(401).json({ message: 'Incorrect password' });
