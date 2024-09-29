@@ -23,6 +23,7 @@ useEffect(()=>{
   axios.get('http://localhost:3009/')
   .then(res=>{
     if(res.status === 200){
+      console.log("SIDE BAR HERE: ")
       console.log(res);
       console.log(res.data.id, " id");
       console.log(res.data.message, " message");

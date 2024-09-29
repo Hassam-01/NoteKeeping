@@ -1,4 +1,4 @@
-
+'use client'
 const express = require('express');
 const app = express();
 const db = require('./db/');
@@ -24,6 +24,7 @@ app.use(cookieParser());
 const verifyUser = (req, res, next) => {
     const token = req.cookies.token;
     if (!token) {
+        // console.log(token, "tokeenenen")
         return res.status(401).json({ message: 'Unauthorized' });
     }
     try {
@@ -54,7 +55,7 @@ app.get('/homes', async (req, res) => {
 });
 
 // ! routing to user page (this will be same as the home page)
-app.get('/home/:id', async (req, res) => {
+app.get('/:id/home/', async (req, res) => {
     try {
         const id = req.params.id;
         const user = await db('users').where('id', id).first();
@@ -69,13 +70,13 @@ app.get('/home/:id', async (req, res) => {
 });
 
 // ! routing to notes page
-app.get('/home/:id/notes/', async (req, res) => {
+app.get('/:id/home/notes/', async (req, res) => {
     try {
       const id = req.params.id;
   
       // Step 1: Fetch the account status from account table
-    const user = await db('users')
-        .join('account', 'users.acc_id', 'account.account_id')
+    const user = await db('account')
+        .join('users', 'account.user_id', 'users.id')
         .select('account.account_status')
         .where('users.id', id)
         .first(); // Only fetch one record, since ID should be unique
@@ -104,61 +105,68 @@ app.get('/home/:id/notes/', async (req, res) => {
     }
   });
   
-app.all('/home/:id/notes/:notesId', async (req, res) => {
+app.put('/:id/home/notes/:notesId', async (req, res) => {
+    const id = req.params.id;
+    const notesId = req.params.notesId;
+    const { title, text } = req.body;
+
+    try {
+        // Update the note in the database
+        const updatedRows = await db('notes')
+            .where({
+                note_id: notesId
+            })
+            .update({
+                title: title,
+                text: text
+            });
+
+        if (updatedRows === 0) {
+            return res.status(404).json({ message: 'Note not found' });
+        }
+
+        res.status(200).json({ message: 'Note updated successfully' });
+
+    } catch (err) {
+        console.error('Error updating note:', err);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+app.delete('/:id/home/notes/:notesId', async (req, res) => {
     const id = req.params.id;
     const notesId = req.params.notesId;
 
     try {
-        if (req.method === 'PUT') {
-            const { title, text } = req.body;
+        // Delete the note from the database
+        const deletedRows = await db('notes')
+            .where({
+                note_id: notesId
+            })
+            .del();
 
-            // Update the note in the database
-            const updatedRows = await db('notes')
-                .where({
-                    note_id: notesId
-                })
-                .update({
-                    title: title,
-                    text: text
-                });
-
-            if (updatedRows === 0) {
-                return res.status(404).json({ message: 'Note not found' });
-            }
-
-            res.status(200).json({ message: 'Note updated successfully' });
-
-        } else if (req.method === 'DELETE') {
-            // Delete the note from the database
-            const deletedRows = await db('notes')
-                .where({
-                    note_id: notesId
-                })
-                .del();
-
-            if (deletedRows === 0) {
-                return res.status(404).json({ message: 'Note not found' });
-            }
-
-            res.status(200).json({ message: 'Note deleted successfully' });
-        } else {
-            res.status(405).json({ message: 'Method not allowed' });
+        if (deletedRows === 0) {
+            return res.status(404).json({ message: 'Note not found' });
         }
 
+        res.status(200).json({ message: 'Note deleted successfully' });
+
     } catch (err) {
-        console.error('Error handling request:', err);
+        console.error('Error deleting note:', err);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
 
 
-app.post('/home/:id/notes/post', async (req, res)=>{
+app.post('/:id/home/notes/post', verifyUser,async (req, res)=>{
+    const id = req.params.id;
     const {title, text} = req.body;
+    console.log("api hitted post")
     try {
         const newNote = await db('notes').insert({
             title: title,
             text: text,
-            user_id: req.params.id
+            user_id: id
         });
         res.status(200).json({message: 'Note created successfully'});
     } catch (error) {
@@ -210,7 +218,7 @@ app.post('/login', async (req, res) => {
             if (err) return res.status(500).json({ message: 'Internal Server Error' });
             if (result) {
                 const id = user.userid;
-                const token = jwt.sign({id}, process.env.JWT_SECRET, {expiresIn: '20m'});
+                const token = jwt.sign({id}, process.env.JWT_SECRET, {expiresIn: '7d'});
 
                 res.cookie('token', token , {httpOnly: true});
                 res.status(200).json({ message: 'Login successful', userId: user.userid });
