@@ -27,7 +27,7 @@ const RegisterPage = () => {
     axios.post('http://localhost:3009/register', values)
     .then(res=>{
         if(res.status === 200){
-            route.push(`/${res.userId}/home/`);
+            route.push(`/login`);
         }
     })
     .then(err=>console.log(err))

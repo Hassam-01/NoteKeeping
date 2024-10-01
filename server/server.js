@@ -24,7 +24,6 @@ app.use(cookieParser());
 const verifyUser = (req, res, next) => {
     const token = req.cookies.token;
     if (!token) {
-        // console.log(token, "tokeenenen")
         return res.status(401).json({ message: 'Unauthorized' });
     }
     try {
@@ -225,7 +224,6 @@ app.post('/login', async (req, res) => {
                 const token = jwt.sign({id}, process.env.JWT_SECRET, {expiresIn: '7d'});
 
                 res.cookie('token', token , {httpOnly: true});
-                Cookies.set()
                 res.status(200).json({ message: 'Login successful', userId: user.userid });
             } else {
                 res.status(401).json({ message: 'Incorrect password' });

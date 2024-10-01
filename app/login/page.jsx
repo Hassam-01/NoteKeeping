@@ -2,8 +2,7 @@
 import axios from 'axios';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAppSelector } from '../_store/hooks';
-import { useDispatch } from 'react-redux';
+
 
 const LoginPage = () => {
 
@@ -12,7 +11,6 @@ const LoginPage = () => {
       password: ''
   });
 
-  const dispatch = useDispatch();
   const route = useRouter();
   const handleLogin = (e) => {
     e.preventDefault();
@@ -21,7 +19,6 @@ const LoginPage = () => {
     .then(res=>{
       if(res.status === 200){
         route.push(`/${res.data.userId}/home/`);
-        dispatch(setUserId(res.data.userId));
       }
     })
     .then(err => console.log(err))
