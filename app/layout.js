@@ -1,8 +1,11 @@
 import { Inter } from "next/font/google";
 import SideBar from "./_components/SideBar";
-import './globals.css';
+import "./globals.css";
 import StoreProvider from "./StoreProvider";
-
+// import { PersistGate } from "redux-persist/integration/react";
+// import { persistor } from "./_store/store";
+// import { PersistGate } from "redux-persist/es/integration/react";
+// import { PersistGate } from "redux-persist/integration/react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -14,15 +17,17 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+          <body className={`${inter.className} flex flex-row`}>
       <StoreProvider>
-      <body className={`${inter.className} flex flex-row`}>
-        <div className="w-1/6 h-screen">
-          <SideBar />
-          <p></p>
-        </div>
-        <main className="h-screen w-[83.4%]">{children}</main>{" "}
-      </body>
-      </ StoreProvider>
+        {/* <PersistGate  persistor={persistor}> */}
+            <div className="w-1/6 h-screen">
+              <SideBar />
+              <p></p>
+            </div>
+            <main className="h-screen w-[83.4%]">{children}</main>
+        {/* </PersistGate> */}
+      </StoreProvider>
+          </body>
     </html>
   );
 }

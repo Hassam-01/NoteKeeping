@@ -1,65 +1,55 @@
-"use client";
-
-import { use, useState } from "react";
-import { useForm } from "react-hook-form"; // Import react-hook-form
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { IoArchiveOutline } from "react-icons/io5";
 import Modal from "react-modal";
-// import { cookies } from "next/headers";
-// import { useAppSelector } from "../_store/hooks";
-// import { on } from "@/server/db";
 
 if (typeof window !== "undefined") {
   Modal.setAppElement(document.body);
-} // Set the root element for accessibility
+}
 
-function NoteCard({ title, initialBody, date, noteId }) {
+function NoteCard({ title, initialBody, date, noteId, user_id }) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [body, setBody] = useState(initialBody); // Local state for body content
+  const [body, setBody] = useState(initialBody);
+  const userID = user_id;
 
-  // Initialize useForm hook with default value
   const { register, handleSubmit, setValue } = useForm({
     defaultValues: {
-      body: initialBody, // Set initial value from props
+      body: initialBody,
     },
   });
 
-  // Update local body state on form submit
+  useEffect(() => {
+    setValue("body", body);
+  }, [body, setValue]);
+
   const onSubmit = (data) => {
-    setBody(data.body); // Save changes locally
-    toggleExpand(); // Close modal after saving
-    updateNote(noteId, data.body); 
+    setBody(data.body);
+    toggleExpand();
+    updateNote(noteId, data.body);
   };
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
-    if(!toggleExpand){
-      onSubmit();  
-    }
   };
-  const handleDelete = () =>{
-    fetch(`http://localhost:3009/home/${id}/notes/${noteId}`, {
+
+  const handleDelete = () => {
+    fetch(`http://localhost:3009/home/${userID}/notes/${noteId}`, {
       method: "DELETE",
     })
       .then((res) => res.json())
-      .then((data) => console.log(data))
       .catch((err) => console.log(err));
-  }
-  const handleArchive = () =>{}
-  // const id = useAppSelector(state => state.userId.userID);
-  // const id = cookies().get('token')?.value;
-  const id = 3;
+  };
+
+  const handleArchive = () => {};
 
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
-  // Manually update the textarea when the modal opens
-  setValue("body", body);
-
   const updateNote = (noteId, updatedBody) => {
-    fetch(`http://localhost:3009/home/${id}/notes/${noteId}`, {
+    fetch(`http://localhost:3009/home/${userID}/notes/${noteId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -74,20 +64,13 @@ function NoteCard({ title, initialBody, date, noteId }) {
   return (
     <div>
       <div onClick={toggleExpand} className="cursor-pointer">
-        <div
-          className={`flex flex-col border-2 md:w-64 max-w-xs md:h-72 w-32 h-36 dark:border-[#F39F5A] bg-white dark:bg-[#28282B] rounded-lg shadow-md relative`}
-          // style={{ borderColor: getRandomColor() }}
-        >
-          {/* Title Bar */}
+        <div className="flex flex-col border-2 md:w-64 max-w-xs md:h-72 w-32 h-36 dark:border-[#F39F5A] bg-white dark:bg-[#28282B] rounded-lg shadow-md relative">
           <div>
             <div className="flex justify-between items-center p-2 md:p-4 bg-blue-100 dark:bg-[#28282B]">
               <h3 className="text-md md:text-lg font-semibold">{title}</h3>
             </div>
           </div>
-          {/* Body */}
-          <div
-            className={`p-4 transition-max-height duration-500 ease-in-out overflow-hidden`}
-          >
+          <div className="p-4 transition-max-height duration-500 ease-in-out overflow-hidden">
             <p>{body}</p>
           </div>
           <div className="my-2 mx-2 text-xs text-gray-500 flex absolute bottom-3">
@@ -98,35 +81,33 @@ function NoteCard({ title, initialBody, date, noteId }) {
 
       <Modal
         isOpen={isExpanded}
-        onRequestClose={toggleExpand} // Close on outside click
+        onRequestClose={toggleExpand}
         contentLabel="Expanded Note"
-        className="modal-content min-w-[600px] dark" // Custom class
-        overlayClassName="modal-overlay " // Custom overlay class
+        className="modal-content min-w-[600px] dark"
+        overlayClassName="modal-overlay"
       >
-        <div className="flex flex-col border-2 w-full max-w-2xl dark:text-white text-black bg-white dark:bg-gray-900 rounded-lg shadow-md ">
-          {/* Title Bar */}
+        <div className="flex flex-col border-2 w-full max-w-2xl dark:text-white text-black bg-white dark:bg-gray-900 rounded-lg shadow-md">
           <div>
             <div className="flex justify-between items-center p-4 bg-blue-100 dark:bg-gray-900">
-              <h3 className="text-lg font-semibold ">{title}</h3>
+              <h3 className="text-lg font-semibold">{title}</h3>
               <div className="flex gap-2">
                 <div className="border-2 border-red-600 rounded-full flex items-center text-center p-2">
                   <RiDeleteBin5Line className="text-red-600 dark:hover:bg-[#2A2A2A] rounded-full" onClick={handleDelete} />
                 </div>
                 <div className="border-2 border-green-700 rounded-full flex items-center text-center p-2">
-                  <IoArchiveOutline className="text-green-700 dark:hover:bg-[#2A2A2A] rounded-full" onClick={handleArchive}/>
+                  <IoArchiveOutline className="text-green-700 dark:hover:bg-[#2A2A2A] rounded-full" onClick={handleArchive} />
                 </div>
               </div>
             </div>
             <hr className="w-full dark:text-gray-500 text-gray-800 my-2" />
           </div>
 
-          {/* Form Body */}
           <form onSubmit={handleSubmit(onSubmit)} className="p-4">
             <textarea
               name="body"
               id="bodytext"
               className="w-full h-32 bg-gray-100 dark:bg-gray-800 dark:text-white p-2 rounded-lg"
-              {...register("body")} // Connect to react-hook-form
+              {...register("body")}
             />
             <button
               type="submit"

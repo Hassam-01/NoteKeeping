@@ -11,7 +11,7 @@ import { IoArchiveOutline } from "react-icons/io5";
 import { BsPeople } from "react-icons/bs";
 import { IoSettingsOutline } from "react-icons/io5";
 import { FaPowerOff } from "react-icons/fa6";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
@@ -23,10 +23,6 @@ useEffect(()=>{
   axios.get('http://localhost:3009/')
   .then(res=>{
     if(res.status === 200){
-      console.log("SIDE BAR HERE: ")
-      console.log(res);
-      console.log(res.data.id, " id");
-      console.log(res.data.message, " message");
       setUserID(res.data.id);
     }
   })
@@ -34,7 +30,6 @@ useEffect(()=>{
 },[])
 
 const route = useRouter();
-console.log(userID);
 return (
     <div className="dark h-full md:flex md:flex-col md:justify-between hidden">
       <div className="dark:bg-[#1E201E] bg-orange-100 p-5 flex flex-col text-center h-full w-full items-center dark:text-[#F39F5A] text-gray-700">

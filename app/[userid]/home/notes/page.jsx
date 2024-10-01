@@ -8,15 +8,14 @@ import { useAppDispatch, useAppSelector } from "../../../_store/hooks";
 import { useEffect, useState } from "react";
 
 import Card from "../../../_components/NoteCard";
-import { useParams } from "next/navigation";
 import axios from "axios";
 
+axios.defaults.withCredentials = true;
 function page() {
   const dispatch = useAppDispatch();
   const [id, setUserID] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  axios.defaults.withCredentials = true;
 
   // First useEffect to get the ID
   useEffect(() => {
@@ -24,8 +23,8 @@ function page() {
       .get("http://localhost:3009/")
       .then((res) => {
         if (res.status === 200) {
-          console.log("ID received:", res.data.id);
           setUserID(res.data.id); // Setting the ID here
+
         }
       })
       .catch((err) => console.log(err));
@@ -35,7 +34,6 @@ function page() {
   useEffect(() => {
     if (!id) return; // If id is null or undefined, do not proceed
 
-    console.log("Fetching notes for ID:", id); // Log the ID being used
     const fetchNotes = async () => {
       try {
         const response = await axios.get(`http://localhost:3009/${id}/home/notes`);
@@ -50,7 +48,7 @@ function page() {
     };
 
     fetchNotes(); // Call fetchNotes only when id is available
-  }, [id, dispatch]); // Dependency array includes `id` and `dispatch`
+  }, [id , dispatch]); // Dependency array includes `id` and `dispatch`
 
   const notes = useAppSelector((state) => state.note.notes);
 
@@ -77,7 +75,6 @@ function page() {
   };
 
   const saveNote = async () => {
-    console.log(modalTitle, modalBody);
     try {
       await axios.post(
         `http://localhost:3009/${id}/home/notes/post`,
@@ -119,6 +116,7 @@ function page() {
                   initialBody={note.text}
                   date={note.date}
                   noteId={note.note_id}
+                  user_id = {id}
                 />
               </div>
             ))

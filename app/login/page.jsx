@@ -2,8 +2,8 @@
 import axios from 'axios';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAppDispatch } from '../_store/hooks';
-import { setUserId } from '../_store/features/user/userIdSlice';
+import { useAppSelector } from '../_store/hooks';
+import { useDispatch } from 'react-redux';
 
 const LoginPage = () => {
 
@@ -12,8 +12,7 @@ const LoginPage = () => {
       password: ''
   });
 
-  const dispatch = useAppDispatch();
-
+  const dispatch = useDispatch();
   const route = useRouter();
   const handleLogin = (e) => {
     e.preventDefault();
@@ -21,8 +20,8 @@ const LoginPage = () => {
     axios.post('http://localhost:3009/login', values)
     .then(res=>{
       if(res.status === 200){
-        dispatch(setUserId(res.data.userId));
         route.push(`/${res.data.userId}/home/`);
+        dispatch(setUserId(res.data.userId));
       }
     })
     .then(err => console.log(err))
