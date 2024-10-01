@@ -29,6 +29,14 @@ useEffect(()=>{
   .catch(err=>console.log(err))
 },[])
 
+const handleLogout = () => {
+  axios.get('http://localhost:3009/logout')
+  .then(res=>{
+    if(res.status === 200){
+      route.push('/login');
+    }
+  })
+}
 const route = useRouter();
 return (
     <div className="dark h-full md:flex md:flex-col md:justify-between hidden">
@@ -78,7 +86,7 @@ return (
           </div>
           <div className="side-bar-labels">
             <FaPowerOff />
-            <p>Logout</p>
+            <p onClick={handleLogout}>Logout</p>
           </div>
         </div>
         {/* Developer Section */}

@@ -37,9 +37,13 @@ const verifyUser = (req, res, next) => {
     }
 };
 app.get('/', verifyUser, (req, res) => {
-    res.status(200).json({ message: 'Welcome to the home page', id: req.userId }); 
+    res.status(200).json({ message: 'user verified', id: req.userId }); 
   });
 
+app.get('/logout', (req, res) => {
+    res.clearCookie('token');
+    res.status(200).json({ message: 'Logged out successfully' });
+});
 
 
 // ! Routing to home page
@@ -221,6 +225,7 @@ app.post('/login', async (req, res) => {
                 const token = jwt.sign({id}, process.env.JWT_SECRET, {expiresIn: '7d'});
 
                 res.cookie('token', token , {httpOnly: true});
+                Cookies.set()
                 res.status(200).json({ message: 'Login successful', userId: user.userid });
             } else {
                 res.status(401).json({ message: 'Incorrect password' });
