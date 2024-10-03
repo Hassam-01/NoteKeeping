@@ -2,47 +2,20 @@ import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import themeReducer from './features/theme/themeSlice';
 import userIdReducer from './features/user/userIdSlice';
 import noteReducer from './features/notes/noteSlice';
-import storage from 'redux-persist/lib/storage'; // use localStorage for web
-import {
-    persistStore,
-    persistReducer,
-    FLUSH,
-    REHYDRATE,
-    PAUSE,
-    PERSIST,
-    PURGE,
-    REGISTER,
-  } from 'redux-persist'
-import { version } from 'react';
-// import { persistStore, persistReducer } from 'redux-persist';
+import drawingReducer from './features/drawing/drawingSlice';
 
-const persistConfig = {
-  key: 'root',
-  version: 1,
-  storage, 
-//   stateReconciler: autoMergeLevel2,
-};
-
-
+// Combine all your reducers into a single root reducer
 const rootReducer = combineReducers({
-    theme: themeReducer,
-    userId: userIdReducer,
-    note: noteReducer,
+  theme: themeReducer,
+  userId: userIdReducer,
+  note: noteReducer,
+  drawing: drawingReducer,
 });
-const persistRootReducer = persistReducer(persistConfig, rootReducer);
 
-
-// const persistedReducer = persistReducer(persistConfig, rootReducer);
-
+// Create and configure the Redux store without persistence
 export const makeStore = () =>
   configureStore({
-    reducer: persistRootReducer,
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-      },
-    }),
+    reducer: rootReducer,  // Simply use the rootReducer
   });
 
-export let persistor = persistStore(makeStore());
+export const store = makeStore();

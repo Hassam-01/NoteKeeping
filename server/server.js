@@ -96,8 +96,12 @@ app.get('/:id/home/notes/', async (req, res) => {
           .where('user_id', id) // Assuming user_id references the user in notes table
           .select('*'); // Adjust the columns you want to fetch
   
-        // Step 3: Return the notes as a response
-        return res.status(200).json({ notes });
+        const drawing = await db('drawing')
+        .where('user_id', id)
+        .select('*');
+
+        return res.status(200).json({ notes, drawing });
+
       } else {
         // If account status is false
         return res.status(403).json({ message: 'Account is inactive' });
@@ -135,6 +139,32 @@ app.put('/:id/home/notes/:notesId', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
+app.put('/:id/home/notes/drawing/:drawing_id', async (req, res) => {
+    const drawingId = req.params.drawing_id;
+    const { title, drawing } = req.body;
+
+    try {
+        // Update the note in the database
+        const updatedRows = await db('drawing')
+            .where({
+                drawing_id: drawingId
+            })
+            .update({
+                title: title,
+                darawing: drawing
+            });
+
+        if (updatedRows === 0) {
+            return res.status(404).json({ message: 'Note not found' });
+        }
+
+        res.status(200).json({ message: 'Note updated successfully' });
+
+    } catch (err) {
+        console.error('Error updating note:', err);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
 
 app.delete('/:id/home/notes/:notesId', async (req, res) => {
     const id = req.params.id;
@@ -159,6 +189,28 @@ app.delete('/:id/home/notes/:notesId', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
+app.delete('/:id/home/notes/drawing/:drawing_id', async (req, res) => {
+    const drawingId = req.params.drawing_id;
+
+    try {
+        // Delete the note from the database
+        const deletedRows = await db('drawing')
+            .where({
+                drawing_id: drawingId
+            })
+            .del();
+
+        if (deletedRows === 0) {
+            return res.status(404).json({ message: 'Note not found' });
+        }
+
+        res.status(200).json({ message: 'Note deleted successfully' });
+
+    } catch (err) {
+        console.error('Error deleting note:', err);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
 
 
 app.post('/:id/home/notes/post', verifyUser,async (req, res)=>{
@@ -169,6 +221,22 @@ app.post('/:id/home/notes/post', verifyUser,async (req, res)=>{
         const newNote = await db('notes').insert({
             title: title,
             text: text,
+            user_id: id
+        });
+        res.status(200).json({message: 'Note created successfully'});
+    } catch (error) {
+        console.error('Error creating note:', error);
+        res.status(500).json({message: 'Internal Server Error'});
+    }
+})
+app.post('/:id/home/notes/drawing/post', verifyUser,async (req, res)=>{
+    const id = req.params.id;
+    const {title, drawing} = req.body;
+    console.log("api hitted post")
+    try {
+        const newDrawing = await db('drawing').insert({
+            title: title,
+            drawing: JSON.stringify(drawing),
             user_id: id
         });
         res.status(200).json({message: 'Note created successfully'});

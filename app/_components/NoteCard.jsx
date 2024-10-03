@@ -34,7 +34,7 @@ function NoteCard({ title, initialBody, date, noteId, user_id }) {
   };
 
   const handleDelete = () => {
-    fetch(`http://localhost:3009/home/${userID}/notes/${noteId}`, {
+    fetch(`http://localhost:3009/${userID}/home/notes/${noteId}`, {
       method: "DELETE",
     })
       .then((res) => res.json())
@@ -49,7 +49,7 @@ function NoteCard({ title, initialBody, date, noteId, user_id }) {
   };
 
   const updateNote = (noteId, updatedBody) => {
-    fetch(`http://localhost:3009/home/${userID}/notes/${noteId}`, {
+    fetch(`http://localhost:3009/${userID}/home/notes/${noteId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

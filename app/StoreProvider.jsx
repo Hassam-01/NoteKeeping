@@ -5,7 +5,6 @@ import { makeStore, persistor } from "./_store/store";
 // import { makeStore, persistor } from "./_store/store";
 
 import { changeTheme } from "./_store/features/theme/themeSlice";
-import { PersistGate } from "redux-persist/integration/react";
 
 export default function StoreProvider({ children }) {
   const storeRef = useRef();
@@ -17,9 +16,7 @@ export default function StoreProvider({ children }) {
 
   return (
     <Provider store={storeRef.current}>
-      <PersistGate persistor={persistor} loading={null}>
         {children}
-      </PersistGate>
     </Provider>
   );
 }

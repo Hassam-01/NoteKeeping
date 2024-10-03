@@ -9,7 +9,9 @@ import { useEffect, useState, useRef } from "react";
 import { ReactSketchCanvas } from "react-sketch-canvas";
 
 import Card from "../../../_components/NoteCard";
+import DrawingPane from "../../../_components/DrawingPane";
 import axios from "axios";
+import { setDrawing } from "../../../_store/features/drawing/drawingSlice";
 
 axios.defaults.withCredentials = true;
 
@@ -42,6 +44,7 @@ function page() {
         const data = response.data;
         await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate delay
         dispatch(setNotes(data.notes));
+        dispatch(setDrawing(data.drawing));
       } catch (err) {
         console.log(err);
       } finally {
@@ -53,6 +56,15 @@ function page() {
   }, [id, dispatch]); // Dependency array includes `id` and `dispatch`
 
   const notes = useAppSelector((state) => state.note.notes);
+  const drawing = useAppSelector((state) => state.drawing.drawing);
+
+  const combinedNotes = [...notes, ...drawing]; // Combine notes and drawings'
+
+  const sortedItems = combinedNotes.sort((a, b) => {
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
+    return dateB - dateA; // Sort descending by date
+  });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDrawModalOpen, setIsDrawModalOpen] = useState(false); // New state for draw modal
@@ -66,23 +78,18 @@ function page() {
     setModalBody("");
     setIsModalOpen(true);
   };
-
   const closeModal = () => {
     setIsModalOpen(false);
   };
-
   const openDrawModal = () => {
     setIsDrawModalOpen(true);
   };
-
   const closeDrawModal = () => {
     setIsDrawModalOpen(false);
   };
-
   const handleCreateNote = () => {
     openModal();
   };
-
   const handleDrawNote = () => {
     openDrawModal();
   };
@@ -109,11 +116,13 @@ function page() {
 
   const saveDrawing = async () => {
     try {
-      const drawingData = await sketchRef.current.exportImage("png"); // Export drawing as a PNG
+      const paths = await sketchRef.current.exportPaths(); // Export paths directly
+      console.log("Exported Paths: ", paths);
+
       await axios.post(
-        `http://localhost:3009/${id}/home/drawings/post`,
+        `http://localhost:3009/${id}/home/notes/drawing/post`,
         {
-          drawing: drawingData, // Save the base64 image data
+          drawing: paths, // Save the paths
         },
         {
           headers: {
@@ -125,10 +134,10 @@ function page() {
     } catch (error) {
       console.error("Error saving drawing:", error);
     }
-  };
+};
+
 
   let handleStrokeColor = (color) => {
-    // sketchRef.current.changeStrokeColor(color);
     setStrokeColor(color);
   };
   return (
@@ -144,23 +153,32 @@ function page() {
           </div>
         </div>
         <div className="lg:grid-cols-4 md:grid-cols-3 grid-cols-2 grid gap-y-5">
-          {loading ? (
+        {loading ? (
             <div className="fixed top-[40%] left-[60%]">
               <Spinner color="white" size="5xl" />
             </div>
-          ) : notes.length > 0 ? (
-            notes.map((note) => (
-              <div key={note.note_id}>
-                <Card
-                  title={note.title}
-                  initialBody={note.text}
-                  date={note.date}
-                  noteId={note.note_id}
-                  user_id={id}
-                />
+          ) : sortedItems.length > 0 ? (
+            sortedItems.map((item) => (
+              <div key={item.note_id || item.drawing_id}>
+                {item.text ? ( // If the item has text, it's a note
+                  <Card
+                    title={item.title}
+                    initialBody={item.text}
+                    date={item.date}
+                    noteId={item.note_id}
+                    user_id={id}
+                  />
+                ) : item.drawing ? ( 
+                  <DrawingPane
+                  initialBody={item.drawing}
+                    date={item.date}
+                    drawing_id={item.drawing_id}
+                    user_id={id}
+                  />
+                ) : null}
               </div>
             ))
-          ) : (
+          ): (
             <p>No notes available</p>
           )}
         </div>
