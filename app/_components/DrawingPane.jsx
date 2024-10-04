@@ -4,6 +4,7 @@ import { RiDeleteBin5Line } from "react-icons/ri";
 import { IoArchiveOutline } from "react-icons/io5";
 import Modal from "react-modal";
 import { ReactSketchCanvas } from "react-sketch-canvas";
+import axios from "axios";
 
 if (typeof window !== "undefined") {
   Modal.setAppElement(document.body);
@@ -14,6 +15,7 @@ function DrawingPane({ title, initialBody, date, drawing_id, user_id }) {
   const [body, setBody] = useState(initialBody);
   const [strokeColor, setStrokeColor] = useState("black");
   const [exportedImage, setExportedImage] = useState(null);
+  // const [exportedPaths, setExportedPaths] = useState(null);
   const userID = user_id;
   const sketchRef = useRef(null); // Ref for the canvas
 
@@ -32,18 +34,37 @@ function DrawingPane({ title, initialBody, date, drawing_id, user_id }) {
       setBody(JSON.stringify(updatedPaths)); // Only update if valid paths exist
     }
   };
+  useEffect(() => {
+    setTimeout(() => {
+      if (isExpanded && sketchRef.current) {
+        // Ensure the canvas is ready after the modal is expanded
+        try {
+          const parsedPaths = Array.isArray(initialBody)
+            ? initialBody
+            : JSON.parse(initialBody);
+          if (Array.isArray(parsedPaths)) {
+            sketchRef.current.clearCanvas(); // Clear the canvas
+            sketchRef.current.loadPaths(parsedPaths); // Load the paths
+          }
+        } catch (error) {
+          console.error("Error parsing initial body:", error);
+        }
+      }
+    }, 200); // Small delay to ensure the modal and canvas are fully rendered
+  }, [isExpanded, initialBody, sketchRef]);
 
   const handleStrokeColor = (color) => {
     setStrokeColor(color);
   };
 
   const onSubmit = async (data) => {
-    setBody(data.body);
-    toggleExpand();
-    await updateDrawing(drawing_id, data.body);
-    exportCanvasToImage();
-  };
+    setBody(data.body); // Update local state
 
+    await updateDrawing(drawing_id); // Ensure update is successful
+    await exportCanvasToImage(); // Export image after the update
+
+    toggleExpand(); // Now toggle the modal after updates
+  };
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
@@ -65,20 +86,22 @@ function DrawingPane({ title, initialBody, date, drawing_id, user_id }) {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
-  const updateDrawing = async (drawing_id, updatedBody) => {
+  const updateDrawing = async (drawing_id) => {
     try {
-      const response = await fetch(
-        `http://localhost:3009/home/${userID}/notes/drawing/${drawing_id}`,
+      const paths = await sketchRef.current.exportPaths(); // Export paths directly
+      const response = await axios.put(
+        `http://localhost:3009/${userID}/home/notes/drawing/${drawing_id}`,
         {
-          method: "PUT",
+          title: title,
+          drawing: paths,
+        },
+        {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ title: title, drawing: updatedBody }),
         }
       );
-      const data = await response.json();
-      console.log(data);
+      console.log(response.data);
     } catch (err) {
       console.log(err);
     }
@@ -89,7 +112,6 @@ function DrawingPane({ title, initialBody, date, drawing_id, user_id }) {
       try {
         const image = await sketchRef.current.exportImage("jpeg");
         setExportedImage(image); // Set the exported image to state
-        console.log("Success exported: ", image);
       } catch (error) {
         console.error("Error exporting image:", error);
       }
@@ -178,25 +200,12 @@ function DrawingPane({ title, initialBody, date, drawing_id, user_id }) {
             </div>
 
             <ReactSketchCanvas
-              ref={(el) => {
-                if (el) {
-                  sketchRef.current = el;
-                  if (initialBody) {
-                    try {
-                      const parsedPaths = Array.isArray(initialBody)
-                        ? initialBody
-                        : JSON.parse(initialBody);
-                      if (Array.isArray(parsedPaths)) {
-                        sketchRef.current.clearCanvas();
-                        sketchRef.current.loadPaths(parsedPaths);
-                      }
-                    } catch (error) {
-                      console.error("Error parsing initial body:", error);
-                    }
-                  }
-                }
+              ref={sketchRef}
+              style={{
+                border: "1px solid #000",
+                width: "100%",
+                height: "300px",
               }}
-              style={{ border: "1px solid #000", width: "100%", height: "300px" }}
               strokeWidth={4}
               strokeColor={strokeColor}
               onChange={handleCanvasChange}
