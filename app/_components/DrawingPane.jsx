@@ -10,12 +10,11 @@ if (typeof window !== "undefined") {
   Modal.setAppElement(document.body);
 }
 
-function DrawingPane({ title, initialBody, date, drawing_id, user_id }) {
+function DrawingPane({ title, initialBody, date, drawing_id, user_id, drawing_img }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [body, setBody] = useState(initialBody);
   const [strokeColor, setStrokeColor] = useState("black");
-  const [exportedImage, setExportedImage] = useState(null);
-  // const [exportedPaths, setExportedPaths] = useState(null);
+  const [exportedImage, setExportedImage] = useState(drawing_img); // Image for both card and modal
   const userID = user_id;
   const sketchRef = useRef(null); // Ref for the canvas
 
@@ -29,15 +28,16 @@ function DrawingPane({ title, initialBody, date, drawing_id, user_id }) {
     setValue("body", body);
   }, [body, setValue]);
 
+
   const handleCanvasChange = (updatedPaths) => {
     if (updatedPaths && updatedPaths.length) {
       setBody(JSON.stringify(updatedPaths)); // Only update if valid paths exist
     }
   };
+
   useEffect(() => {
     setTimeout(() => {
       if (isExpanded && sketchRef.current) {
-        // Ensure the canvas is ready after the modal is expanded
         try {
           const parsedPaths = Array.isArray(initialBody)
             ? initialBody
@@ -65,6 +65,7 @@ function DrawingPane({ title, initialBody, date, drawing_id, user_id }) {
 
     toggleExpand(); // Now toggle the modal after updates
   };
+
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
@@ -89,11 +90,15 @@ function DrawingPane({ title, initialBody, date, drawing_id, user_id }) {
   const updateDrawing = async (drawing_id) => {
     try {
       const paths = await sketchRef.current.exportPaths(); // Export paths directly
+      const image = await sketchRef.current.exportImage("png"); 
+      const base64Image = image.split(',')[1];
+
       const response = await axios.put(
         `http://localhost:3009/${userID}/home/notes/drawing/${drawing_id}`,
         {
           title: title,
           drawing: paths,
+          drawing_img: base64Image
         },
         {
           headers: {
@@ -118,6 +123,7 @@ function DrawingPane({ title, initialBody, date, drawing_id, user_id }) {
     }
   };
 
+
   return (
     <div>
       <div onClick={toggleExpand} className="cursor-pointer">
@@ -128,7 +134,11 @@ function DrawingPane({ title, initialBody, date, drawing_id, user_id }) {
             </div>
           </div>
           <div className="p-4 transition-max-height duration-500 ease-in-out overflow-hidden">
-            {exportedImage && <img src={exportedImage} alt="Drawing" />}
+            {exportedImage ? (
+              <img src={exportedImage} alt="Drawing" />
+            ) : (
+              <p>No image available</p>
+            )}
           </div>
           <div className="my-2 mx-2 text-xs text-gray-500 flex absolute bottom-3">
             <p className="text-xs px-2">{formatDate(date)}</p>

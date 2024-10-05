@@ -117,12 +117,14 @@ function page() {
   const saveDrawing = async () => {
     try {
       const paths = await sketchRef.current.exportPaths(); // Export paths directly
-      console.log("Exported Paths: ", paths);
-
+      const exportedImage = await sketchRef.current.exportImage("png"); // Export paths directly
+     
+      const base64Image = exportedImage.split(',')[1];
       await axios.post(
         `http://localhost:3009/${id}/home/notes/drawing/post`,
         {
           drawing: paths, // Save the paths
+          drawing_img: base64Image
         },
         {
           headers: {
@@ -171,6 +173,7 @@ function page() {
                 ) : item.drawing ? ( 
                   <DrawingPane
                   initialBody={item.drawing}
+                  drawing_img={`data:image/png;base64,${item.drawing_img}`}
                     date={item.date}
                     drawing_id={item.drawing_id}
                     user_id={id}

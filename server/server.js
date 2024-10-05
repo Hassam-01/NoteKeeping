@@ -21,7 +21,6 @@ app.use(cookieParser());
 
 const verifyUser = (req, res, next) => {
   const token = req.cookies.token;
-  console.log(token)
   if (!token) {
     console.log("hello verify")
     return res.status(401).json({ message: "Unauthorized" });
@@ -73,101 +72,56 @@ app.get("/:id/home/", async (req, res) => {
 
 // ! routing to notes page
 app.get("/:id/home/notes/", async (req, res) => {
-  try {
-    const id = req.params.id;
-
-    // Step 1: Fetch the account status from account table
-    const user = await db("account")
-      .join("users", "account.user_id", "users.id")
-      .select("account.account_status")
-      .where("users.id", id)
-      .first(); // Only fetch one record, since ID should be unique
-    // Check if user exists and has an account status
-    if (!user || user.account_status === undefined) {
-      return res.status(404).json({ message: "User or Account not found" });
+    try {
+      const id = req.params.id;
+  
+      // Fetch the account status
+      const user = await db("account")
+        .join("users", "account.user_id", "users.id")
+        .select("account.account_status")
+        .where("users.id", id)
+        .first();
+  
+      if (!user || user.account_status === undefined) {
+        return res.status(404).json({ message: "User or Account not found" });
+      }
+  
+      const { account_status } = user;
+  
+      if (account_status) {
+        // Fetch notes
+        const notes = await db("notes")
+          .where("user_id", id)
+          .select("*");
+  
+        // Fetch drawings
+        const drawings = await db("drawing").where("user_id", id).select("*");
+  
+        // Convert the drawing image data (bytea) to base64
+        const drawingsWithBase64Images = drawings.map((drawing) => ({
+          ...drawing,
+          drawing_img: drawing.drawing_img
+            ? drawing.drawing_img.toString("base64") // Convert bytea to base64
+            : null,
+        }));
+  
+        return res.status(200).json({ notes, drawing: drawingsWithBase64Images });
+      } else {
+        return res.status(403).json({ message: "Account is inactive" });
+      }
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ message: "Internal Server Error" });
     }
-
-    const { account_status } = user;
-
-    // Step 2: If account status is true, fetch the notes
-    if (account_status) {
-      const notes = await db("notes")
-        .where("user_id", id) // Assuming user_id references the user in notes table
-        .select("*"); // Adjust the columns you want to fetch
-
-      const drawing = await db("drawing").where("user_id", id).select("*");
-
-      return res.status(200).json({ notes, drawing });
-    } else {
-      // If account status is false
-      return res.status(403).json({ message: "Account is inactive" });
-    }
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
-});
-
-// app.put('/:id/home/notes/:notesId', async (req, res) => {
-//     const id = req.params.id;
-//     const notesId = req.params.notesId;
-//     const { title, text } = req.body;
-
-//     try {
-//         // Update the note in the database
-//         const updatedRows = await db('notes')
-//             .where({
-//                 note_id: notesId
-//             })
-//             .update({
-//                 title: title,
-//                 text: text
-//             });
-
-//         if (updatedRows === 0) {
-//             return res.status(404).json({ message: 'Note not found' });
-//         }
-
-//         res.status(200).json({ message: 'Note updated successfully' });
-
-//     } catch (err) {
-//         console.error('Error updating note:', err);
-//         res.status(500).json({ message: 'Internal Server Error' });
-//     }
-// });
-// app.put('/:id/home/notes/drawing/:drawing_id/put', async (req, res) => {
-//     const drawingId = req.params.drawing_id;
-//     const { title, drawing } = req.body;
-//     console.log(JSON.stringify(drawing), " from server")
-//     // console.log(drawing, " this is drawing from server")
-//     try {
-//         // Update the note in the database
-//         const updatedRows = await db('drawing')
-//             .where({
-//                 drawing_id: drawingId
-//             })
-//             .update({
-//                 title: title,
-//                 drawing: JSON.stringify(drawing)
-//             });
-
-//         if (updatedRows === 0) {
-//             return res.status(404).json({ message: 'Drawing not found' });
-//         }
-
-//         res.status(200).json({ message: 'Drawing updated successfully' });
-
-//     } catch (err) {
-//         console.error('Error updating drawing:', err);
-//         res.status(500).json({ message: 'Internal Server Error' });
-//     }
-// });
+  });
+  
 
 app.put("/:id/home/notes/drawing/:drawing_id", verifyUser, async (req, res) => {
-  const { title, drawing } = req.body;
+  const { title, drawing, drawing_img } = req.body;
   const drawing_id = req.params.drawing_id;
 
   try {
+    const buffer = Buffer.from(drawing_img, 'base64');
     const updatedDrawing = await db("drawing")
       .where({
         drawing_id: drawing_id,
@@ -175,6 +129,7 @@ app.put("/:id/home/notes/drawing/:drawing_id", verifyUser, async (req, res) => {
       .update({
         title: title,
         drawing: JSON.stringify(drawing),
+        drawing_img: buffer
       });
     if (updatedDrawing === 0) {
       return res.status(404).json({ message: "Drawing not found" });
@@ -249,11 +204,13 @@ app.post("/:id/home/notes/post", verifyUser, async (req, res) => {
 });
 app.post("/:id/home/notes/drawing/post", verifyUser, async (req, res) => {
   const id = req.params.id;
-  const { title, drawing } = req.body;
+  const { title, drawing, drawing_img } = req.body;
   try {
+    const buffer = Buffer.from(drawing_img, 'base64');
     const newDrawing = await db("drawing").insert({
       title: title,
       drawing: JSON.stringify(drawing),
+      drawing_img: buffer,
       user_id: id,
     });
     res.status(200).json({ message: "Note created successfully" });
