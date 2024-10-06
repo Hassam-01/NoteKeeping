@@ -205,60 +205,6 @@ function page() {
         >
           <div className="flex flex-col p-4 border-2 dark:text-white bg-white dark:bg-gray-900 rounded-lg shadow-md">
             {/* Modal content */}
-            <div className="flex justify-between items-center p-4 bg-blue-100 dark:bg-gray-900">
-              <div className="flex flex-col gap-2">
-                <h3 className="text-lg font-semibold">Draw Note</h3>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleStrokeColor("red")}
-                    className="w-4 h-4 rounded-full bg-red-700"
-                  ></button>
-                  <button
-                    onClick={() => handleStrokeColor("yellow")}
-                    className="w-4 h-4 rounded-full bg-yellow-600"
-                  ></button>
-                  <button
-                    onClick={() => handleStrokeColor("blue")}
-                    className="w-4 h-4 rounded-full bg-blue-700"
-                  ></button>
-                  <button
-                    onClick={() => handleStrokeColor("green")}
-                    className="w-4 h-4 rounded-full bg-green-500"
-                  ></button>
-                  <button
-                    onClick={() => handleStrokeColor("pink")}
-                    className="w-4 h-4 rounded-full bg-pink-400"
-                  ></button>
-                  <button
-                    onClick={() => handleStrokeColor("black")}
-                    className="w-4 h-4 rounded-full bg-black"
-                  ></button>
-                </div>
-              </div>
-              <button onClick={closeDrawModal} className="text-red-600">
-                Close
-              </button>
-            </div>
-            <hr className="w-full dark:text-gray-500 text-gray-800 my-2" />
-            <div className="p-4">
-              <ReactSketchCanvas
-                ref={sketchRef}
-                style={{
-                  border: "1px solid #000",
-                  width: "100%",
-                  height: "300px",
-                }}
-                strokeWidth={4}
-                strokeColor={strokeColor}
-              />
-              <button
-                type="button"
-                className="mt-4 px-4 py-2 bg-[#bf6e2c] text-white rounded-lg hover:bg-[#9b6436]"
-                onClick={saveDrawing}
-              >
-                Save Drawing
-              </button>
-            </div>
             <form className="p-4">
               <input
                 type="text"
@@ -294,6 +240,41 @@ function page() {
         >
           <div className="flex flex-col p-4 border-2 dark:text-white bg-white dark:bg-gray-900 rounded-lg shadow-md">
             {/* Drawing Canvas */}
+            <div className="flex justify-between items-center p-4 bg-blue-100 dark:bg-gray-900">
+              <div className="flex flex-col gap-2">
+                <h3 className="text-lg font-semibold">Draw Note</h3>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleStrokeColor("red")}
+                    className="w-4 h-4 rounded-full bg-red-700"
+                  ></button>
+                  <button
+                    onClick={() => handleStrokeColor("yellow")}
+                    className="w-4 h-4 rounded-full bg-yellow-600"
+                  ></button>
+                  <button
+                    onClick={() => handleStrokeColor("blue")}
+                    className="w-4 h-4 rounded-full bg-blue-700"
+                  ></button>
+                  <button
+                    onClick={() => handleStrokeColor("green")}
+                    className="w-4 h-4 rounded-full bg-green-500"
+                  ></button>
+                  <button
+                    onClick={() => handleStrokeColor("pink")}
+                    className="w-4 h-4 rounded-full bg-pink-400"
+                  ></button>
+                  <button
+                    onClick={() => handleStrokeColor("black")}
+                    className="w-4 h-4 rounded-full bg-black"
+                  ></button>
+                </div>
+              </div>
+              <button onClick={closeDrawModal} className="text-red-600">
+                Close
+              </button>
+            </div>
+            <hr className="w-full dark:text-gray-500 text-gray-800 my-2" />
             <div className="p-4">
               <ReactSketchCanvas
                 ref={sketchRef}
