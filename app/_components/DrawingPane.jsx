@@ -10,7 +10,14 @@ if (typeof window !== "undefined") {
   Modal.setAppElement(document.body);
 }
 
-function DrawingPane({ title, initialBody, date, drawing_id, user_id, drawing_img }) {
+function DrawingPane({
+  title,
+  initialBody,
+  date,
+  drawing_id,
+  user_id,
+  drawing_img,
+}) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [body, setBody] = useState(initialBody);
   const [strokeColor, setStrokeColor] = useState("black");
@@ -27,7 +34,6 @@ function DrawingPane({ title, initialBody, date, drawing_id, user_id, drawing_im
   useEffect(() => {
     setValue("body", body);
   }, [body, setValue]);
-
 
   const handleCanvasChange = (updatedPaths) => {
     if (updatedPaths && updatedPaths.length) {
@@ -83,22 +89,29 @@ function DrawingPane({ title, initialBody, date, drawing_id, user_id, drawing_im
   };
 
   const formatDate = (dateString) => {
-    const options = { year: "numeric", month: "long", day: "numeric" };
-    return new Date(dateString).toLocaleDateString(undefined, options);
+    const date = new Date(dateString);
+    const now = new Date();
+    const options = { month: "short", day: "numeric" };
+
+    if (date.getFullYear() !== now.getFullYear()) {
+      options.year = "numeric";
+    }
+
+    return date.toLocaleDateString(undefined, options);
   };
 
   const updateDrawing = async (drawing_id) => {
     try {
       const paths = await sketchRef.current.exportPaths(); // Export paths directly
-      const image = await sketchRef.current.exportImage("png"); 
-      const base64Image = image.split(',')[1];
+      const image = await sketchRef.current.exportImage("png");
+      const base64Image = image.split(",")[1];
 
       const response = await axios.put(
         `http://localhost:3009/${userID}/home/notes/drawing/${drawing_id}`,
         {
           title: title,
           drawing: paths,
-          drawing_img: base64Image
+          drawing_img: base64Image,
         },
         {
           headers: {
@@ -123,7 +136,6 @@ function DrawingPane({ title, initialBody, date, drawing_id, user_id, drawing_im
     }
   };
 
-
   return (
     <div>
       <div onClick={toggleExpand} className="cursor-pointer">
@@ -135,7 +147,12 @@ function DrawingPane({ title, initialBody, date, drawing_id, user_id, drawing_im
           </div>
           <div className="p-4 transition-max-height duration-500 ease-in-out overflow-hidden">
             {exportedImage ? (
-              <img src={exportedImage} alt="Drawing" />
+              <img
+                src={exportedImage}
+                alt="Drawing"
+                className="h-16 w-full object-cover" // Set height and width
+                style={{ maxHeight: "100%", maxWidth: "100%" }} // Ensure it doesn’t exceed container size
+              />
             ) : (
               <p>No image available</p>
             )}

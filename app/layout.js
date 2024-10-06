@@ -17,17 +17,18 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-          <body className={`${inter.className} flex flex-row`}>
-      <StoreProvider>
-        {/* <PersistGate  persistor={persistor}> */}
-            <div className="w-1/6 h-screen">
-              <SideBar />
-              <p></p>
-            </div>
-            <main className="h-screen w-[83.4%]">{children}</main>
-        {/* </PersistGate> */}
-      </StoreProvider>
-          </body>
+      <body className={`${inter.className} flex flex-row z-10`}>
+        <StoreProvider>
+          {/* <PersistGate  persistor={persistor}> */}
+          <div className=" md:w-[200px] h-full z-20">
+            <SideBar />
+            <p></p>
+          </div>
+          <main className="h-screen w-full md:w-[calc(100%-200px)] z-10">
+            {children}</main>
+          {/* </PersistGate> */}
+        </StoreProvider>
+      </body>
     </html>
   );
 }

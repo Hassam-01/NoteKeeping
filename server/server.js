@@ -22,7 +22,6 @@ app.use(cookieParser());
 const verifyUser = (req, res, next) => {
   const token = req.cookies.token;
   if (!token) {
-    console.log("hello verify")
     return res.status(401).json({ message: "Unauthorized" });
   }
   try {

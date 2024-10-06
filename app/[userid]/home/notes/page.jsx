@@ -70,7 +70,7 @@ function page() {
   const [isDrawModalOpen, setIsDrawModalOpen] = useState(false); // New state for draw modal
   const [modalTitle, setModalTitle] = useState("");
   const [modalBody, setModalBody] = useState("");
-  const [strokeColor , setStrokeColor] = useState("black");
+  const [strokeColor, setStrokeColor] = useState("black");
   const sketchRef = useRef(null); // Ref for the drawing canvas
 
   const openModal = () => {
@@ -118,13 +118,13 @@ function page() {
     try {
       const paths = await sketchRef.current.exportPaths(); // Export paths directly
       const exportedImage = await sketchRef.current.exportImage("png"); // Export paths directly
-     
-      const base64Image = exportedImage.split(',')[1];
+
+      const base64Image = exportedImage.split(",")[1];
       await axios.post(
         `http://localhost:3009/${id}/home/notes/drawing/post`,
         {
           drawing: paths, // Save the paths
-          drawing_img: base64Image
+          drawing_img: base64Image,
         },
         {
           headers: {
@@ -136,16 +136,15 @@ function page() {
     } catch (error) {
       console.error("Error saving drawing:", error);
     }
-};
-
+  };
 
   let handleStrokeColor = (color) => {
     setStrokeColor(color);
   };
   return (
     <div className="dark h-screen">
-      <div className="dark:bg-[#0c0c0c] h-full bg-orange-100 dark:text-white text-black p-10 flex flex-col relative">
-        <div className="rounded-full border-[#F39F5A] hidden md:flex mt-2 mb-5 justify-end">
+      <div className="dark:bg-[#0c0c0c] h-full border-2 border-red-500 items-center bg-orange-100 dark:text-white text-black md:p-10 flex flex-col relative">
+        <div className="h-fit absolute top-3 right-5 md:flex md:mt-2 md:mb-5 justify-end">
           <div className="flex gap-2">
             <IoIosAddCircleOutline
               className="edit-tools"
@@ -154,15 +153,16 @@ function page() {
             <MdOutlineDraw className="edit-tools" onClick={handleDrawNote} />
           </div>
         </div>
-        <div className="lg:grid-cols-4 md:grid-cols-3 grid-cols-2 grid gap-y-5">
-        {loading ? (
-            <div className="fixed top-[40%] left-[60%]">
+        {/* Grid to display notes/drawings, responsive layout */}
+        <div className="grid gap-y-5 grid-cols-2 lg:grid-cols-3 gap-6 my-24 md:my-2">
+          {loading ? (
+            <div className="fixed top-[40%] left-[50%]">
               <Spinner color="white" size="5xl" />
             </div>
           ) : sortedItems.length > 0 ? (
             sortedItems.map((item) => (
-              <div key={item.note_id || item.drawing_id}>
-                {item.text ? ( // If the item has text, it's a note
+              <div key={item.note_id || item.drawing_id} className="w-full">
+                {item.text ? (
                   <Card
                     title={item.title}
                     initialBody={item.text}
@@ -170,10 +170,10 @@ function page() {
                     noteId={item.note_id}
                     user_id={id}
                   />
-                ) : item.drawing ? ( 
+                ) : item.drawing ? (
                   <DrawingPane
-                  initialBody={item.drawing}
-                  drawing_img={`data:image/png;base64,${item.drawing_img}`}
+                    initialBody={item.drawing}
+                    drawing_img={`data:image/png;base64,${item.drawing_img}`}
                     date={item.date}
                     drawing_id={item.drawing_id}
                     user_id={id}
@@ -181,8 +181,8 @@ function page() {
                 ) : null}
               </div>
             ))
-          ): (
-            <p>No notes available</p>
+          ) : (
+            <p className="text-center">No notes available</p>
           )}
         </div>
 
@@ -191,30 +191,24 @@ function page() {
           isOpen={isModalOpen}
           onRequestClose={closeModal}
           contentLabel="Create Note"
-          className="modal-content min-w-[600px] dark"
+          className="modal-content w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg dark"
           overlayClassName="modal-overlay"
         >
-          <div className="flex flex-col border-2 w-full max-w-2xl dark:text-white text-black bg-white dark:bg-gray-900 rounded-lg shadow-md">
-            <div className="flex justify-between items-center p-4 bg-blue-100 dark:bg-gray-900">
-              <h3 className="text-lg font-semibold">Create Note</h3>
-              <button onClick={closeModal} className="text-red-600">
-                Close
-              </button>
-            </div>
-            <hr className="w-full dark:text-gray-500 text-gray-800 my-2" />
+          <div className="flex flex-col p-4 border-2 dark:text-white bg-white dark:bg-gray-900 rounded-lg shadow-md">
+            {/* Modal content */}
             <form className="p-4">
               <input
                 type="text"
                 placeholder="Title"
                 value={modalTitle}
                 onChange={(e) => setModalTitle(e.target.value)}
-                className="w-full mb-4 p-2 bg-gray-100 dark:bg-gray-800 dark:text-white rounded-lg"
+                className="w-full mb-4 p-2 bg-gray-100 dark:bg-gray-800 rounded-lg"
               />
               <textarea
                 placeholder="Body"
                 value={modalBody}
                 onChange={(e) => setModalBody(e.target.value)}
-                className="w-full h-32 bg-gray-100 dark:bg-gray-800 dark:text-white p-2 rounded-lg"
+                className="w-full h-32 bg-gray-100 dark:bg-gray-800 p-2 rounded-lg"
               />
               <button
                 type="button"
@@ -232,27 +226,11 @@ function page() {
           isOpen={isDrawModalOpen}
           onRequestClose={closeDrawModal}
           contentLabel="Draw Note"
-          className="modal-content min-w-[600px] dark"
+          className="modal-content w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg dark"
           overlayClassName="modal-overlay"
         >
-          <div className="flex flex-col border-2 w-full max-w-2xl dark:text-white text-black bg-white dark:bg-gray-900 rounded-lg shadow-md">
-            <div className="flex justify-between items-center p-4 bg-blue-100 dark:bg-gray-900">
-              <div className="flex flex-col gap-2">
-                <h3 className="text-lg font-semibold">Draw Note</h3>
-                <div className="flex gap-2">
-                  <button onClick={()=>handleStrokeColor("red")} className="w-4 h-4 rounded-full bg-red-700"></button>
-                  <button onClick={()=>handleStrokeColor("yellow")} className="w-4 h-4 rounded-full bg-yellow-600"></button>
-                  <button onClick={()=>handleStrokeColor("blue")} className="w-4 h-4 rounded-full bg-blue-700"></button>
-                  <button onClick={()=>handleStrokeColor("green")} className="w-4 h-4 rounded-full bg-green-500"></button>
-                  <button onClick={()=>handleStrokeColor("pink")} className="w-4 h-4 rounded-full bg-pink-400"></button>
-                  <button onClick={()=>handleStrokeColor("black")} className="w-4 h-4 rounded-full bg-black"></button>
-                </div>
-              </div>
-              <button onClick={closeDrawModal} className="text-red-600">
-                Close
-              </button>
-            </div>
-            <hr className="w-full dark:text-gray-500 text-gray-800 my-2" />
+          <div className="flex flex-col p-4 border-2 dark:text-white bg-white dark:bg-gray-900 rounded-lg shadow-md">
+            {/* Drawing Canvas */}
             <div className="p-4">
               <ReactSketchCanvas
                 ref={sketchRef}

@@ -8,7 +8,7 @@
   }
 
   .edit-tools{
-    @apply h-10 w-10 text-[#F39F5A] hover:bg-gray-200 dark:hover:bg-[#2A2A2A] rounded-full p-1 cursor-pointer;
+    @apply h-8 w-8 md:h-10 md:w-10  text-[#F39F5A] hover:bg-gray-200 dark:hover:bg-[#2A2A2A] rounded-full p-1 cursor-pointer;
   }
   
   .modal-content {

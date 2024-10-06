@@ -19,7 +19,7 @@ useEffect(()=>{
 
 
   return (
-    <div className="dark h-screen dark:bg-[#0c0c0c] bg-orange-100">
+    <div className="dark h-screen dark:bg-[#0c0c0c] z-0 bg-orange-100">
       Home Page
       <p>User ID: {userID}</p>
     </div>
