@@ -143,8 +143,8 @@ function page() {
   };
   return (
     <div className="dark h-screen">
-      <div className="dark:bg-[#0c0c0c] h-full border-2 border-red-500 items-center bg-orange-100 dark:text-white text-black md:p-10 flex flex-col relative">
-        <div className="h-fit absolute top-3 right-5 md:flex md:mt-2 md:mb-5 justify-end">
+      <div className="dark:bg-[#0c0c0c] h-full items-center bg-orange-100 dark:text-white text-black md:p-10 flex flex-col relative">
+        <div className="h-fit w-full items-end flex mt-3 md:mt-2 md:mb-10 justify-end">
           <div className="flex gap-2">
             <IoIosAddCircleOutline
               className="edit-tools"
@@ -154,37 +154,46 @@ function page() {
           </div>
         </div>
         {/* Grid to display notes/drawings, responsive layout */}
-        <div className="grid gap-y-5 grid-cols-2 lg:grid-cols-3 gap-6 my-24 md:my-2">
+        <h1 className="text-3xl md:hidden font-semibold my-24 text-[#c56f28] dark:text-[#ffa45b]">NOTES</h1>
+        <div className="h-[90%] md:w-full flex flex-col justify-center">
+        <div className="grid-container h-[95%] overflow-hidden overflow-y-auto "
+         style={{
+          msOverflowStyle: "none", /* Internet Explorer 10+ */
+          scrollbarWidth: "none", /* Firefox */
+        }}>
           {loading ? (
             <div className="fixed top-[40%] left-[50%]">
               <Spinner color="white" size="5xl" />
             </div>
           ) : sortedItems.length > 0 ? (
-            sortedItems.map((item) => (
-              <div key={item.note_id || item.drawing_id} className="w-full">
-                {item.text ? (
-                  <Card
+            <div className="grid gap-y-5 grid-cols-2 lg:grid-cols-3 gap-6">
+              {sortedItems.map((item) => (
+                <div key={item.note_id || item.drawing_id} className="w-full">
+                  {item.text ? (
+                    <Card
                     title={item.title}
                     initialBody={item.text}
                     date={item.date}
                     noteId={item.note_id}
                     user_id={id}
-                  />
-                ) : item.drawing ? (
-                  <DrawingPane
-                    initialBody={item.drawing}
-                    drawing_img={`data:image/png;base64,${item.drawing_img}`}
-                    date={item.date}
-                    drawing_id={item.drawing_id}
-                    user_id={id}
-                  />
-                ) : null}
-              </div>
-            ))
+                    />
+                  ) : item.drawing ? (
+                    <DrawingPane
+                      initialBody={item.drawing}
+                      drawing_img={`data:image/png;base64,${item.drawing_img}`}
+                      date={item.date}
+                      drawing_id={item.drawing_id}
+                      user_id={id}
+                    />
+                  ) : null}
+                </div>
+              ))}
+            </div>
           ) : (
             <p className="text-center">No notes available</p>
           )}
         </div>
+          </div>
 
         {/* Note Creation Modal */}
         <Modal
@@ -200,12 +209,30 @@ function page() {
               <div className="flex flex-col gap-2">
                 <h3 className="text-lg font-semibold">Draw Note</h3>
                 <div className="flex gap-2">
-                  <button onClick={()=>handleStrokeColor("red")} className="w-4 h-4 rounded-full bg-red-700"></button>
-                  <button onClick={()=>handleStrokeColor("yellow")} className="w-4 h-4 rounded-full bg-yellow-600"></button>
-                  <button onClick={()=>handleStrokeColor("blue")} className="w-4 h-4 rounded-full bg-blue-700"></button>
-                  <button onClick={()=>handleStrokeColor("green")} className="w-4 h-4 rounded-full bg-green-500"></button>
-                  <button onClick={()=>handleStrokeColor("pink")} className="w-4 h-4 rounded-full bg-pink-400"></button>
-                  <button onClick={()=>handleStrokeColor("black")} className="w-4 h-4 rounded-full bg-black"></button>
+                  <button
+                    onClick={() => handleStrokeColor("red")}
+                    className="w-4 h-4 rounded-full bg-red-700"
+                  ></button>
+                  <button
+                    onClick={() => handleStrokeColor("yellow")}
+                    className="w-4 h-4 rounded-full bg-yellow-600"
+                  ></button>
+                  <button
+                    onClick={() => handleStrokeColor("blue")}
+                    className="w-4 h-4 rounded-full bg-blue-700"
+                  ></button>
+                  <button
+                    onClick={() => handleStrokeColor("green")}
+                    className="w-4 h-4 rounded-full bg-green-500"
+                  ></button>
+                  <button
+                    onClick={() => handleStrokeColor("pink")}
+                    className="w-4 h-4 rounded-full bg-pink-400"
+                  ></button>
+                  <button
+                    onClick={() => handleStrokeColor("black")}
+                    className="w-4 h-4 rounded-full bg-black"
+                  ></button>
                 </div>
               </div>
               <button onClick={closeDrawModal} className="text-red-600">
