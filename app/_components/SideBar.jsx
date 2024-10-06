@@ -65,12 +65,8 @@ return (
             <p onClick={() => route.push(`/${userID}/home/notes`)}>Notes</p>
             </div>
           <div className="side-bar-labels">
-            <FaRegBell />
-            <p onClick={()=> route.push(`/${userID}/home/reminders`)}>Reminders</p>
-          </div>
-          <div className="side-bar-labels">
             <IoArchiveOutline />
-            <p onClick={()=> route.push(`/home/${userID}/archives`)}>Archives</p>
+            <p onClick={()=> route.push(`/${userID}/home/archives`)}>Archives</p>
           </div>
           <div className="side-bar-labels">
             <BsPeople />
