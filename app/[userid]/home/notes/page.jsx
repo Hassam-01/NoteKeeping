@@ -109,6 +109,7 @@ function page() {
         }
       );
       closeModal();
+      window.location.reload();
     } catch (error) {
       console.error("Error saving note:", error);
     }
@@ -133,6 +134,7 @@ function page() {
         }
       );
       closeDrawModal();
+      window.location.reload();
     } catch (error) {
       console.error("Error saving drawing:", error);
     }
@@ -154,46 +156,48 @@ function page() {
           </div>
         </div>
         {/* Grid to display notes/drawings, responsive layout */}
-        <h1 className="text-3xl md:hidden font-semibold my-24 text-[#c56f28] dark:text-[#ffa45b]">NOTES</h1>
-        <div className="h-[90%] md:w-full flex flex-col justify-center">
-        <div className="grid-container h-[95%] overflow-hidden overflow-y-auto "
-         style={{
-          msOverflowStyle: "none", /* Internet Explorer 10+ */
-          scrollbarWidth: "none", /* Firefox */
-        }}>
-          {loading ? (
-            <div className="fixed top-[40%] left-[50%]">
-              <Spinner color="white" size="5xl" />
-            </div>
-          ) : sortedItems.length > 0 ? (
-            <div className="grid gap-y-5 grid-cols-2 lg:grid-cols-3 gap-6">
-              {sortedItems.map((item) => (
-                <div key={item.note_id || item.drawing_id} className="w-full">
-                  {item.text ? (
-                    <Card
-                    title={item.title}
-                    initialBody={item.text}
-                    date={item.date}
-                    noteId={item.note_id}
-                    user_id={id}
-                    />
-                  ) : item.drawing ? (
-                    <DrawingPane
-                      initialBody={item.drawing}
-                      drawing_img={`data:image/png;base64,${item.drawing_img}`}
-                      date={item.date}
-                      drawing_id={item.drawing_id}
-                      user_id={id}
-                    />
-                  ) : null}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-center">No notes available</p>
-          )}
-        </div>
+        <h1 className="text-3xl md:hidden font-semibold my-24 text-[#c56f28] dark:text-[#ffa45b]">
+          NOTES
+        </h1>
+        <div className="h-[90%] max-h-[90vh] md:w-full flex flex-col justify-center overflow-hidden">
+        <div className="grid-container md:h-[95%] h-[80%] overflow-y-auto">
+            {loading ? (
+              <div className="fixed top-[40%] left-[50%]">
+                <Spinner color="white" size="5xl" />
+              </div>
+            ) : sortedItems.length > 0 ? (
+              <div className="grid gap-y-5 grid-cols-2 lg:grid-cols-3 gap-6 overflow-hidden overflow-y-auto h-[80%] md:h-full"
+              style={{
+                msOverflowStyle: "none" /* Internet Explorer 10+ */,
+                scrollbarWidth: "none" /* Firefox */,
+              }}>
+                {sortedItems.map((item) => (
+                  <div key={item.note_id || item.drawing_id} className="w-full">
+                    {item.text ? (
+                      <Card
+                        title={item.title}
+                        initialBody={item.text}
+                        date={item.date}
+                        noteId={item.note_id}
+                        user_id={id}
+                      />
+                    ) : item.drawing ? (
+                      <DrawingPane
+                        initialBody={item.drawing}
+                        drawing_img={`data:image/png;base64,${item.drawing_img}`}
+                        date={item.date}
+                        drawing_id={item.drawing_id}
+                        user_id={id}
+                      />
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center">No notes available</p>
+            )}
           </div>
+        </div>
 
         {/* Note Creation Modal */}
         <Modal

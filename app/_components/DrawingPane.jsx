@@ -70,18 +70,26 @@ function DrawingPane({
     await exportCanvasToImage(); // Export image after the update
 
     toggleExpand(); // Now toggle the modal after updates
+    window.location.reload();
   };
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
 
-  const handleDelete = () => {
-    fetch(`http://localhost:3009/${userID}/home/notes/drawing/${drawing_id}`, {
-      method: "DELETE",
-    })
-      .then((res) => res.json())
-      .catch((err) => console.log(err));
+  const handleDelete = async () => {
+    try {
+      await fetch(
+        `http://localhost:3009/${userID}/home/notes/drawing/${drawing_id}`,
+        {
+          method: "DELETE",
+        }
+      );
+      toggleExpand(); // Close modal on delete
+      window.location.reload();
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const handleArchive = () => {
@@ -137,7 +145,7 @@ function DrawingPane({
   };
 
   return (
-    <div>
+    <div className="dark">
       <div onClick={toggleExpand} className="cursor-pointer">
         <div className="flex flex-col border-2 md:w-64 max-w-xs md:h-72 w-32 h-36 dark:border-[#F39F5A] bg-white dark:bg-[#28282B] rounded-lg shadow-md relative">
           <div>
@@ -150,8 +158,8 @@ function DrawingPane({
               <img
                 src={exportedImage}
                 alt="Drawing"
-                className="h-16 w-full object-cover" // Set height and width
-                style={{ maxHeight: "100%", maxWidth: "100%" }} // Ensure it doesn’t exceed container size
+                className="h-16 w-full object-cover"
+                style={{ maxHeight: "100%", maxWidth: "100%" }}
               />
             ) : (
               <p>No image available</p>
@@ -167,30 +175,28 @@ function DrawingPane({
         isOpen={isExpanded}
         onRequestClose={toggleExpand}
         contentLabel="Expanded Note"
-        className="modal-content min-w-[600px] dark"
+        className="modal-content dark w-full max-w-lg p-4 dark:bg-gray-900 bg-white rounded-lg shadow-md mx-auto"
         overlayClassName="modal-overlay"
       >
-        <div className="flex flex-col border-2 w-full max-w-2xl dark:text-white text-black bg-white dark:bg-gray-900 rounded-lg shadow-md">
-          <div>
-            <div className="flex justify-between items-center p-4 bg-blue-100 dark:bg-gray-900">
-              <h3 className="text-lg font-semibold">{title}</h3>
-              <div className="flex gap-2">
-                <div className="border-2 border-red-600 rounded-full flex items-center text-center p-2">
-                  <RiDeleteBin5Line
-                    className="text-red-600 dark:hover:bg-[#2A2A2A] rounded-full"
-                    onClick={handleDelete}
-                  />
-                </div>
-                <div className="border-2 border-green-700 rounded-full flex items-center text-center p-2">
-                  <IoArchiveOutline
-                    className="text-green-700 dark:hover:bg-[#2A2A2A] rounded-full"
-                    onClick={handleArchive}
-                  />
-                </div>
+        <div className="flex flex-col dark:text-white text-black">
+          <div className="flex justify-between items-center p-4 bg-blue-100 dark:bg-gray-900">
+            <h3 className="text-lg font-semibold">{title}</h3>
+            <div className="flex gap-2">
+              <div className="border-2 border-red-600 rounded-full flex items-center text-center p-2 cursor-pointer">
+                <RiDeleteBin5Line
+                  className="text-red-600 dark:hover:bg-[#2A2A2A] rounded-full"
+                  onClick={handleDelete}
+                />
+              </div>
+              <div className="border-2 border-green-700 rounded-full flex items-center text-center p-2 cursor-pointer">
+                <IoArchiveOutline
+                  className="text-green-700 dark:hover:bg-[#2A2A2A] rounded-full"
+                  onClick={handleArchive}
+                />
               </div>
             </div>
-            <hr className="w-full dark:text-gray-500 text-gray-800 my-2" />
           </div>
+          <hr className="w-full dark:text-gray-500 text-gray-800 my-2" />
 
           <form onSubmit={handleSubmit(onSubmit)} className="p-4">
             <div className="flex gap-2 my-2">
