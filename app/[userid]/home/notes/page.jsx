@@ -24,7 +24,7 @@ function page() {
   // First useEffect to get the ID
   useEffect(() => {
     axios
-      .get("http://localhost:3009/")
+      .get("http://localhost:3009/verifyUser")
       .then((res) => {
         if (res.status === 200) {
           setUserID(res.data.id); // Setting the ID here
@@ -43,7 +43,7 @@ function page() {
           `http://localhost:3009/${id}/home/notes`
         );
         const data = response.data;
-        await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate delay
+        await new Promise((resolve) => setTimeout(resolve, 200)); // Simulate delay
         dispatch(setNotes(data.notes));
         dispatch(setDrawing(data.drawing));
       } catch (err) {

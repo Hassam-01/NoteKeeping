@@ -7,7 +7,7 @@ function Archives() {
         <div>
         <SideBar/>
       </div>
-      <div className="h-full w-full flex flex-col justify-center">
+      <div className="h-full w-full flex items-center justify-center">
         <div className="flex flex-col w-full max-w-4xl items-center text-center justify-start my-5 p-6 gap-8">
           {/* Header Section */}
           <div className="flex flex-col gap-5 mb-8">

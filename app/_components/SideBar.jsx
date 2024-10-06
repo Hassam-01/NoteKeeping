@@ -24,7 +24,7 @@ function SideBar() {
   axios.defaults.withCredentials = true;
   useEffect(() => {
     axios
-      .get('http://localhost:3009/')
+      .get('http://localhost:3009/verifyUser')
       .then(res => {
         if (res.status === 200) {
           setUserID(res.data.id);
@@ -49,7 +49,7 @@ useEffect(()=>{
   const handleLogout = () => {
     axios.get('http://localhost:3009/logout').then(res => {
       if (res.status === 200) {
-        route.push('/login');
+        route.push('http://localhost:3000/');
       }
     });
   };

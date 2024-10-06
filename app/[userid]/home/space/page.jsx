@@ -18,8 +18,7 @@ function Page() {
   useEffect(() => {
     const fetchUserID = async () => {
       try {
-        await new Promise((resolve) => setTimeout(resolve, 200));
-        const res = await axios.get("http://localhost:3009/");
+        const res = await axios.get("http://localhost:3009/verifyUser");
         if (res.status === 200) {
           setUserID(res.data.id);
         }

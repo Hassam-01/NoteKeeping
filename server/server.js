@@ -33,7 +33,7 @@ const verifyUser = (req, res, next) => {
     return res.status(401).json({ message: "Unauthorized" });
   }
 };
-app.get("/", verifyUser, (req, res) => {
+app.get("/verifyUser", verifyUser, (req, res) => {
   res.status(200).json({ message: "user verified", id: req.userId });
 });
 
