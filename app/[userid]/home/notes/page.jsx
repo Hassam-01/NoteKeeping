@@ -12,6 +12,7 @@ import Card from "../../../_components/NoteCard";
 import DrawingPane from "../../../_components/DrawingPane";
 import axios from "axios";
 import { setDrawing } from "../../../_store/features/drawing/drawingSlice";
+import SideBar from "../../../_components/SideBar";
 
 axios.defaults.withCredentials = true;
 
@@ -144,162 +145,172 @@ function page() {
     setStrokeColor(color);
   };
   return (
-    <div className="dark h-screen">
-      <div className="dark:bg-[#0c0c0c] h-full items-center bg-orange-100 dark:text-white text-black md:p-10 flex flex-col relative">
-        <div className="h-fit w-full items-end flex mt-3 md:mt-2 md:mb-10 justify-end">
-          <div className="flex gap-2">
-            <IoIosAddCircleOutline
-              className="edit-tools"
-              onClick={handleCreateNote}
-            />
-            <MdOutlineDraw className="edit-tools" onClick={handleDrawNote} />
-          </div>
-        </div>
-        {/* Grid to display notes/drawings, responsive layout */}
-        <h1 className="text-3xl md:hidden font-semibold my-24 text-[#c56f28] dark:text-[#ffa45b]">
-          NOTES
-        </h1>
-        <div className="h-[90%] max-h-[90vh] md:w-full flex flex-col justify-center overflow-hidden">
-        <div className="grid-container md:h-[95%] h-[80%] overflow-y-auto">
-            {loading ? (
-              <div className="fixed top-[40%] left-[50%]">
-                <Spinner color="white" size="5xl" />
-              </div>
-            ) : sortedItems.length > 0 ? (
-              <div className="grid gap-y-5 grid-cols-2 lg:grid-cols-3 gap-6 overflow-hidden overflow-y-auto h-[80%] md:h-full"
-              style={{
-                msOverflowStyle: "none" /* Internet Explorer 10+ */,
-                scrollbarWidth: "none" /* Firefox */,
-              }}>
-                {sortedItems.map((item) => (
-                  <div key={item.note_id || item.drawing_id} className="w-full">
-                    {item.text ? (
-                      <Card
-                        title={item.title}
-                        initialBody={item.text}
-                        date={item.date}
-                        noteId={item.note_id}
-                        user_id={id}
-                      />
-                    ) : item.drawing ? (
-                      <DrawingPane
-                        initialBody={item.drawing}
-                        drawing_img={`data:image/png;base64,${item.drawing_img}`}
-                        date={item.date}
-                        drawing_id={item.drawing_id}
-                        user_id={id}
-                      />
-                    ) : null}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-center">No notes available</p>
-            )}
-          </div>
-        </div>
-
-        {/* Note Creation Modal */}
-        <Modal
-          isOpen={isModalOpen}
-          onRequestClose={closeModal}
-          contentLabel="Create Note"
-          className="modal-content w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg dark"
-          overlayClassName="modal-overlay"
-        >
-          <div className="flex flex-col p-4 border-2 dark:text-white bg-white dark:bg-gray-900 rounded-lg shadow-md">
-            {/* Modal content */}
-            <form className="p-4">
-              <input
-                type="text"
-                placeholder="Title"
-                value={modalTitle}
-                onChange={(e) => setModalTitle(e.target.value)}
-                className="w-full mb-4 p-2 bg-gray-100 dark:bg-gray-800 rounded-lg"
+    <div className="dark h-screen flex w-full">
+      <div>
+        <SideBar />
+      </div>
+      <div className="w-full h-full">
+        <div className="dark:bg-[#0c0c0c] w-full h-full items-center bg-orange-100 dark:text-white text-black md:p-10 flex flex-col relative">
+          <div className="h-fit w-full items-end flex mt-3 md:mt-2 md:mb-10 justify-end">
+            <div className="flex gap-2">
+              <IoIosAddCircleOutline
+                className="edit-tools"
+                onClick={handleCreateNote}
               />
-              <textarea
-                placeholder="Body"
-                value={modalBody}
-                onChange={(e) => setModalBody(e.target.value)}
-                className="w-full h-32 bg-gray-100 dark:bg-gray-800 p-2 rounded-lg"
-              />
-              <button
-                type="button"
-                className="mt-4 px-4 py-2 bg-[#bf6e2c] text-white rounded-lg hover:bg-[#9b6436]"
-                onClick={saveNote}
-              >
-                Save
-              </button>
-            </form>
+              <MdOutlineDraw className="edit-tools" onClick={handleDrawNote} />
+            </div>
           </div>
-        </Modal>
-
-        {/* Drawing Modal */}
-        <Modal
-          isOpen={isDrawModalOpen}
-          onRequestClose={closeDrawModal}
-          contentLabel="Draw Note"
-          className="modal-content w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg dark"
-          overlayClassName="modal-overlay"
-        >
-          <div className="flex flex-col p-4 border-2 dark:text-white bg-white dark:bg-gray-900 rounded-lg shadow-md">
-            {/* Drawing Canvas */}
-            <div className="flex justify-between items-center p-4 bg-blue-100 dark:bg-gray-900">
-              <div className="flex flex-col gap-2">
-                <h3 className="text-lg font-semibold">Draw Note</h3>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleStrokeColor("red")}
-                    className="w-4 h-4 rounded-full bg-red-700"
-                  ></button>
-                  <button
-                    onClick={() => handleStrokeColor("yellow")}
-                    className="w-4 h-4 rounded-full bg-yellow-600"
-                  ></button>
-                  <button
-                    onClick={() => handleStrokeColor("blue")}
-                    className="w-4 h-4 rounded-full bg-blue-700"
-                  ></button>
-                  <button
-                    onClick={() => handleStrokeColor("green")}
-                    className="w-4 h-4 rounded-full bg-green-500"
-                  ></button>
-                  <button
-                    onClick={() => handleStrokeColor("pink")}
-                    className="w-4 h-4 rounded-full bg-pink-400"
-                  ></button>
-                  <button
-                    onClick={() => handleStrokeColor("black")}
-                    className="w-4 h-4 rounded-full bg-black"
-                  ></button>
+          {/* Grid to display notes/drawings, responsive layout */}
+          <h1 className="text-3xl md:hidden font-semibold my-24 text-[#c56f28] dark:text-[#ffa45b]">
+            NOTES
+          </h1>
+          <div className="h-[90%] max-h-[90vh] md:w-full flex flex-col justify-center overflow-hidden">
+            <div className="grid-container md:h-[95%] h-[80%] overflow-y-auto">
+              {loading ? (
+                <div className="fixed top-[40%] left-[50%]">
+                  <Spinner color="white" size="5xl" />
                 </div>
-              </div>
-              <button onClick={closeDrawModal} className="text-red-600">
-                Close
-              </button>
-            </div>
-            <hr className="w-full dark:text-gray-500 text-gray-800 my-2" />
-            <div className="p-4">
-              <ReactSketchCanvas
-                ref={sketchRef}
-                style={{
-                  border: "1px solid #000",
-                  width: "100%",
-                  height: "300px",
-                }}
-                strokeWidth={4}
-                strokeColor={strokeColor}
-              />
-              <button
-                type="button"
-                className="mt-4 px-4 py-2 bg-[#bf6e2c] text-white rounded-lg hover:bg-[#9b6436]"
-                onClick={saveDrawing}
-              >
-                Save Drawing
-              </button>
+              ) : sortedItems.length > 0 ? (
+                <div
+                  className="grid gap-y-5 grid-cols-2 lg:grid-cols-4 gap-4 overflow-hidden overflow-y-auto h-[80%] md:h-full"
+                  style={{
+                    msOverflowStyle: "none" /* Internet Explorer 10+ */,
+                    scrollbarWidth: "none" /* Firefox */,
+                  }}
+                >
+                  {sortedItems.map((item) => (
+                    <div
+                      key={item.note_id || item.drawing_id}
+                      className="w-full"
+                    >
+                      {item.text ? (
+                        <Card
+                          title={item.title}
+                          initialBody={item.text}
+                          date={item.date}
+                          noteId={item.note_id}
+                          user_id={id}
+                        />
+                      ) : item.drawing ? (
+                        <DrawingPane
+                          initialBody={item.drawing}
+                          drawing_img={`data:image/png;base64,${item.drawing_img}`}
+                          date={item.date}
+                          drawing_id={item.drawing_id}
+                          user_id={id}
+                        />
+                      ) : null}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-center">No notes available</p>
+              )}
             </div>
           </div>
-        </Modal>
+
+          {/* Note Creation Modal */}
+          <Modal
+            isOpen={isModalOpen}
+            onRequestClose={closeModal}
+            contentLabel="Create Note"
+            className="modal-content w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg dark"
+            overlayClassName="modal-overlay"
+          >
+            <div className="flex flex-col p-4 border-2 dark:text-white bg-white dark:bg-gray-900 rounded-lg shadow-md">
+              {/* Modal content */}
+              <form className="p-4">
+                <input
+                  type="text"
+                  placeholder="Title"
+                  value={modalTitle}
+                  onChange={(e) => setModalTitle(e.target.value)}
+                  className="w-full mb-4 p-2 bg-gray-100 dark:bg-gray-800 rounded-lg"
+                />
+                <textarea
+                  placeholder="Body"
+                  value={modalBody}
+                  onChange={(e) => setModalBody(e.target.value)}
+                  className="w-full h-32 bg-gray-100 dark:bg-gray-800 p-2 rounded-lg"
+                />
+                <button
+                  type="button"
+                  className="mt-4 px-4 py-2 bg-[#bf6e2c] text-white rounded-lg hover:bg-[#9b6436]"
+                  onClick={saveNote}
+                >
+                  Save
+                </button>
+              </form>
+            </div>
+          </Modal>
+
+          {/* Drawing Modal */}
+          <Modal
+            isOpen={isDrawModalOpen}
+            onRequestClose={closeDrawModal}
+            contentLabel="Draw Note"
+            className="modal-content w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg dark"
+            overlayClassName="modal-overlay"
+          >
+            <div className="flex flex-col p-4 border-2 dark:text-white bg-white dark:bg-gray-900 rounded-lg shadow-md">
+              {/* Drawing Canvas */}
+              <div className="flex justify-between items-center p-4 bg-blue-100 dark:bg-gray-900">
+                <div className="flex flex-col gap-2">
+                  <h3 className="text-lg font-semibold">Draw Note</h3>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleStrokeColor("red")}
+                      className="w-4 h-4 rounded-full bg-red-700"
+                    ></button>
+                    <button
+                      onClick={() => handleStrokeColor("yellow")}
+                      className="w-4 h-4 rounded-full bg-yellow-600"
+                    ></button>
+                    <button
+                      onClick={() => handleStrokeColor("blue")}
+                      className="w-4 h-4 rounded-full bg-blue-700"
+                    ></button>
+                    <button
+                      onClick={() => handleStrokeColor("green")}
+                      className="w-4 h-4 rounded-full bg-green-500"
+                    ></button>
+                    <button
+                      onClick={() => handleStrokeColor("pink")}
+                      className="w-4 h-4 rounded-full bg-pink-400"
+                    ></button>
+                    <button
+                      onClick={() => handleStrokeColor("black")}
+                      className="w-4 h-4 rounded-full bg-black"
+                    ></button>
+                  </div>
+                </div>
+                <button onClick={closeDrawModal} className="text-red-600">
+                  Close
+                </button>
+              </div>
+              <hr className="w-full dark:text-gray-500 text-gray-800 my-2" />
+              <div className="p-4">
+                <ReactSketchCanvas
+                  ref={sketchRef}
+                  style={{
+                    border: "1px solid #000",
+                    width: "100%",
+                    height: "300px",
+                  }}
+                  strokeWidth={4}
+                  strokeColor={strokeColor}
+                />
+                <button
+                  type="button"
+                  className="mt-4 px-4 py-2 bg-[#bf6e2c] text-white rounded-lg hover:bg-[#9b6436]"
+                  onClick={saveDrawing}
+                >
+                  Save Drawing
+                </button>
+              </div>
+            </div>
+          </Modal>
+        </div>
       </div>
     </div>
   );

@@ -158,7 +158,7 @@ function DrawingPane({
               <img
                 src={exportedImage}
                 alt="Drawing"
-                className="h-16 w-full object-cover"
+                className="h-16 md:h-4/6 w-full object-cover"
                 style={{ maxHeight: "100%", maxWidth: "100%" }}
               />
             ) : (

@@ -19,7 +19,8 @@ import { FaBars } from "react-icons/fa"; // Hamburger icon for mobile
 function SideBar() {
   const [userID, setUserID] = useState(null);
   const [isOpen, setIsOpen] = useState(false); // State to manage sidebar open/close for mobile
-
+  const [userName, setUserName] = useState("");
+  const [subscription, setSubscription] = useState("");
   axios.defaults.withCredentials = true;
   useEffect(() => {
     axios
@@ -30,7 +31,20 @@ function SideBar() {
         }
       })
       .catch(err => console.log(err));
+      
   }, []);
+useEffect(()=>{
+  console.log("object 00")
+      axios.get(`http://localhost:3009/userData`)
+        .then(res =>{
+          console.log("object 01")
+          if(res.status === 200){
+            setUserName(res.data.userName)
+            setSubscription(res.data.subscription)
+          }
+        })
+        .catch(err=> console.log(err))
+},[])
 
   const handleLogout = () => {
     axios.get('http://localhost:3009/logout').then(res => {
@@ -57,19 +71,19 @@ function SideBar() {
       {/* Sidebar */}
       <div className={`${
     isOpen ? 'block' : 'hidden'
-}  md:flex md:flex-col md:justify-between fixed md:static inset-y-0 left-0 z-50 md:z-auto dark h-screen bg-orange-100 dark:bg-[#1E201E] p-5 text-center w-[250px] md:w-full items-center dark:text-[#F39F5A] text-gray-700 transition-transform duration-500 ease-in-out`}>
+}  md:flex md:flex-col md:justify-between fixed md:static inset-y-0 left-0 z-50 md:z-auto dark h-screen bg-orange-100 dark:bg-[#1E201E] p-5 text-center w-[250px] md:w-[200px]  items-center dark:text-[#F39F5A] text-gray-700 transition-transform duration-500 ease-in-out`}>
     {/* Account Section */}
     <div className="account md:mt-4 mt-10 flex flex-col items-center">
           <div className="profile py-2">
             <Image
-              src={profile}
+              src={""}
               alt="profile"
               className="border-2 border-[#F39F5A] h-24 w-24 rounded-full"
             />
           </div>
           <div className="mt-4">
-            <div className="text-lg font-semibold">Hassam Ali</div>
-            <div className="text-sm text-gray-400">Premium</div>
+            <div className="text-sm font-semibold" >{userName.toString().toUpperCase()}</div>
+            <div className="text-xs text-gray-400">{subscription}</div>
           </div>
         </div>
 
@@ -103,8 +117,8 @@ function SideBar() {
   </div>
 
   {/* Developer Section */}
-  <div className="Company-name items-center justify-center flex my-2 dark:text-[#F39F5A] text-gray-700 text-xs absolute md:left-6 bottom-2"> {/* Adjusted margin */}
-    Developed by Soma Tusi
+  <div className="Company-name items-center justify-center flex my-2 dark:text-[#F39F5A] text-gray-700 text-xs absolute md:left-6 bottom-2  "> {/* Adjusted margin */}
+    Developed by Hassam Ali
   </div>
 </div>
 

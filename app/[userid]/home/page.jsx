@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
+import SideBar from "../../_components/SideBar";
 
 function Home() {
 const [userID, setUserID] = useState(null);
@@ -19,9 +20,13 @@ useEffect(()=>{
 
 
   return (
-    <div className="dark h-screen dark:bg-[#0c0c0c] z-0 bg-orange-100">
+    <div className="dark h-screen dark:bg-[#0c0c0c] bg-orange-100 flex">
+      <div>
+        <SideBar/>
+      </div>
+      <div>
       Home Page
-      <p>User ID: {userID}</p>
+      </div>
     </div>
   );
 }

@@ -5,13 +5,13 @@ import axios from "axios";
 import { useParams } from 'next/navigation';
 
 function page() {
-    const {roomID} = useParams();
+    const {meetingID} = useParams();
     const [userID, setUserID] = useState(null);
-
+    console.log(meetingID, "from room")
     useEffect(() => {
         const fetchUserID = async () => {
             try {
-                await new Promise(resolve => setTimeout(resolve, 200)); // 2-second delay
+                // await new Promise(resolve => setTimeout(resolve, 200)); // 2-second delay
                 const res = await axios.get("http://localhost:3009/");
                 if (res.status === 200) {
                     setUserID(res.data.id);
@@ -24,11 +24,12 @@ function page() {
         fetchUserID();
     }, []);
     console.log(userID, "user id here")
+    
     const Mymeeting = async (element) => {
         const appID = 550177510;
         const serverSecret = "733f62ca76f5bb152f18c3ca16608108";
 
-        const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(appID, serverSecret, roomID, userID.toString(), "hassam")
+        const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(appID, serverSecret, meetingID, userID.toString(), "hassam")
 
         const zp = ZegoUIKitPrebuilt.create(kitToken);
 

@@ -37,6 +37,29 @@ app.get("/", verifyUser, (req, res) => {
   res.status(200).json({ message: "user verified", id: req.userId });
 });
 
+app.get("/userData", verifyUser, async (req, res) => {
+  // const userId = req.params.id;
+  const userId = req.userId;
+  try {
+    const userName = await db('users')
+      .select(db.raw("first_name || ' ' || last_name AS full_name"))
+      .where('id', userId)
+      .first();
+    
+    const subscription = await db('users')
+      .join('account', 'users.id', 'account.user_id')
+      .join('subscription', 'account.subscription_id', 'subscription.subscription_id')
+      .select('subscription.subscription_type')
+      .where('users.id', userId)
+      .first();
+
+    res.status(200).json({ userName: userName.full_name, subscription: subscription.subscription_type });
+  } catch (err) {
+    console.error("Error fetching user data: ", err);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
 app.get("/logout", (req, res) => {
   res.clearCookie("token");
   res.status(200).json({ message: "Logged out successfully" });
@@ -188,7 +211,6 @@ app.delete("/:id/home/notes/drawing/:drawing_id", async (req, res) => {
 app.post("/:id/home/notes/post", verifyUser, async (req, res) => {
   const id = req.params.id;
   const { title, text } = req.body;
-  console.log("api hitted post");
   try {
     const newNote = await db("notes").insert({
       title: title,
