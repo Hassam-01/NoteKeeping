@@ -5,11 +5,9 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 // * profile image
-import profile from "../../public/profile.jpg";
 
 // * icons from react icons
 import { CgNotes } from "react-icons/cg";
-import { FaRegBell } from "react-icons/fa";
 import { IoArchiveOutline } from "react-icons/io5";
 import { BsPeople } from "react-icons/bs";
 import { IoSettingsOutline } from "react-icons/io5";
