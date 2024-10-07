@@ -87,5 +87,7 @@ Go to your project directory and navigate to the space -> room -> [meetingID] se
 Use the following .env parameters for ZegoCloud:
 
 NEXT_PUBLIC_MEETINGSECRET=<your_zegocloud_meeting_secret>
+
 NEXT_PUBLIC_MEETINGAPPID=<your_zegocloud_meeting_appid>
+
 These parameters are required for the live meeting functionality in the app.
