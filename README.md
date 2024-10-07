@@ -61,15 +61,22 @@ Create a .env file at the root of your project with the following parameters for
 PORT=3009
 
 PGUSER=<your_postgresql_user>
+
 PGPASSWORD=<your_postgresql_password>
+
 PGHOST=localhost
+
 PGPORT=5432
+
 PGDATABASE=<your_database_name>
+
 JWT_SECRET=<your_jwt_secret_key>
 
 ## Meeting Configuration (ZegoCloud)
 NEXT_PUBLIC_MEETINGSECRET=<your_zegocloud_meeting_secret>
+
 NEXT_PUBLIC_MEETINGAPPID=<your_zegocloud_meeting_appid>
+
 Replace the placeholders (<...>) with your actual environment variables.
 
 ## ZegoCloud Meeting Settings
