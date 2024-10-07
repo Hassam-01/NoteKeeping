@@ -1,40 +1,84 @@
-<<<<<<< HEAD
-# NoteKeeping
-=======
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Note-Keeping Web App
+
+This project is a **full-stack note-keeping app** built using the **PERN stack**. It allows users to take notes, create drawings, and collaborate in live meetings, all in one place.
+
+## Technologies Used
+
+- **Frontend**: React, Next.js, Tailwind CSS, React Icons, React Sketch Canvas
+- **State Management**: React Redux Toolkit
+- **Backend**: Express.js, Node.js
+- **Database**: PostgreSQL
+- **Live Meeting**: ZegoUIKitPrebuilt
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+Ensure you have the following installed on your machine:
+
+- [Node.js](https://nodejs.org/)
+- [PostgreSQL](https://www.postgresql.org/)
+
+### Frontend
+
+1. Navigate to the frontend directory:
+
+   ```bash
+   cd app
+   ```
+Install the necessary dependencies:
+
+  ```bash
+  npm install
+```
+### Start the frontend development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
+The frontend will be running on http://localhost:3000.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Backend
+Navigate to the backend directory:
+```bash
+cd app/server
+```
+### Install backend dependencies:
+```bash
+npm install
+```
+### Start the backend server:
+```bash
+npm run dev
+```
+The backend server will be running on http://localhost:3009.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+.env Setup
+Create a .env file at the root of your project with the following parameters for configuring both the database and JWT authentication:
 
-## Learn More
+# Backend Configuration
+PORT=3009
 
-To learn more about Next.js, take a look at the following resources:
+PGUSER=<your_postgresql_user>
+PGPASSWORD=<your_postgresql_password>
+PGHOST=localhost
+PGPORT=5432
+PGDATABASE=<your_database_name>
+JWT_SECRET=<your_jwt_secret_key>
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Meeting Configuration (ZegoCloud)
+NEXT_PUBLIC_MEETINGSECRET=<your_zegocloud_meeting_secret>
+NEXT_PUBLIC_MEETINGAPPID=<your_zegocloud_meeting_appid>
+Replace the placeholders (<...>) with your actual environment variables.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## ZegoCloud Meeting Settings
+To configure the live meeting functionality:
 
-## Deploy on Vercel
+Go to your project directory and navigate to the space -> room -> [meetingID] settings.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Use the following .env parameters for ZegoCloud:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
->>>>>>> 9e0639c (sidebar and note card setup done)
+NEXT_PUBLIC_MEETINGSECRET=<your_zegocloud_meeting_secret>
+NEXT_PUBLIC_MEETINGAPPID=<your_zegocloud_meeting_appid>
+These parameters are required for the live meeting functionality in the app.
