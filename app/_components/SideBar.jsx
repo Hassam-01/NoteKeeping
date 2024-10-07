@@ -34,10 +34,8 @@ function SideBar() {
       
   }, []);
 useEffect(()=>{
-  console.log("object 00")
       axios.get(`http://localhost:3009/userData`)
         .then(res =>{
-          console.log("object 01")
           if(res.status === 200){
             setUserName(res.data.userName)
             setSubscription(res.data.subscription)

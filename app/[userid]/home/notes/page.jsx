@@ -20,7 +20,10 @@ function page() {
   const dispatch = useAppDispatch();
   const [id, setUserID] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [eraseMode, setEraseMode] = useState(false);
 
+  const notes = useAppSelector((state) => state.note.notes);
+  const drawing = useAppSelector((state) => state.drawing.drawing);
   // First useEffect to get the ID
   useEffect(() => {
     axios
@@ -56,10 +59,12 @@ function page() {
     fetchNotes(); // Call fetchNotes only when id is available
   }, [id, dispatch]); // Dependency array includes `id` and `dispatch`
 
-  const notes = useAppSelector((state) => state.note.notes);
-  const drawing = useAppSelector((state) => state.drawing.drawing);
-
   const combinedNotes = [...notes, ...drawing]; // Combine notes and drawings'
+
+  const handleErase = () => {
+    setEraseMode(!eraseMode);
+    sketchRef.current?.eraseMode(eraseMode);
+  };
 
   const sortedItems = combinedNotes.sort((a, b) => {
     const dateA = new Date(a.date);
@@ -142,6 +147,7 @@ function page() {
   };
 
   let handleStrokeColor = (color) => {
+    setEraseMode(false);
     setStrokeColor(color);
   };
   return (
@@ -255,38 +261,53 @@ function page() {
             <div className="flex flex-col p-4 border-2 dark:text-white bg-white dark:bg-gray-900 rounded-lg shadow-md">
               {/* Drawing Canvas */}
               <div className="flex justify-between items-center p-4 bg-blue-100 dark:bg-gray-900">
-                <div className="flex flex-col gap-2">
-                  <h3 className="text-lg font-semibold">Draw Note</h3>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleStrokeColor("red")}
-                      className="w-4 h-4 rounded-full bg-red-700"
-                    ></button>
-                    <button
-                      onClick={() => handleStrokeColor("yellow")}
-                      className="w-4 h-4 rounded-full bg-yellow-600"
-                    ></button>
-                    <button
-                      onClick={() => handleStrokeColor("blue")}
-                      className="w-4 h-4 rounded-full bg-blue-700"
-                    ></button>
-                    <button
-                      onClick={() => handleStrokeColor("green")}
-                      className="w-4 h-4 rounded-full bg-green-500"
-                    ></button>
-                    <button
-                      onClick={() => handleStrokeColor("pink")}
-                      className="w-4 h-4 rounded-full bg-pink-400"
-                    ></button>
-                    <button
-                      onClick={() => handleStrokeColor("black")}
-                      className="w-4 h-4 rounded-full bg-black"
-                    ></button>
+                <div className="flex flex-col gap-2 w-full">
+                  <div className="flex justify-between">
+                    <h3 className="text-lg font-semibold">Draw Note</h3>
+                    <button onClick={closeDrawModal} className="text-red-600">
+                      Close
+                    </button>
+                  </div>
+                  <div className="flex justify-between w-full">
+                    <div className="flex gap-2 my-2">
+                      <button
+                        type="button"
+                        onClick={() => handleStrokeColor("red")}
+                        className="w-4 h-4 rounded-full bg-red-700"
+                      ></button>
+                      <button
+                        type="button"
+                        onClick={() => handleStrokeColor("yellow")}
+                        className="w-4 h-4 rounded-full bg-yellow-600"
+                      ></button>
+                      <button
+                        type="button"
+                        onClick={() => handleStrokeColor("blue")}
+                        className="w-4 h-4 rounded-full bg-blue-700"
+                      ></button>
+                      <button
+                        type="button"
+                        onClick={() => handleStrokeColor("green")}
+                        className="w-4 h-4 rounded-full bg-green-500"
+                      ></button>
+                      <button
+                        type="button"
+                        onClick={() => handleStrokeColor("pink")}
+                        className="w-4 h-4 rounded-full bg-pink-400"
+                      ></button>
+                      <button
+                        type="button"
+                        onClick={() => handleStrokeColor("black")}
+                        className="w-4 h-4 rounded-full bg-black"
+                      ></button>
+                    </div>
+                    <div className="flex items-center">
+                      <h3 className="cursor-pointer" onClick={handleErase}>
+                        Erase
+                      </h3>
+                    </div>
                   </div>
                 </div>
-                <button onClick={closeDrawModal} className="text-red-600">
-                  Close
-                </button>
               </div>
               <hr className="w-full dark:text-gray-500 text-gray-800 my-2" />
               <div className="p-4">

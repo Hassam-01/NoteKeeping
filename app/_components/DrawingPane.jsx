@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { IoArchiveOutline } from "react-icons/io5";
@@ -21,7 +21,10 @@ function DrawingPane({
   const [isExpanded, setIsExpanded] = useState(false);
   const [body, setBody] = useState(initialBody);
   const [strokeColor, setStrokeColor] = useState("black");
+  const [strokeWidth, setStrokeWidth] = useState(4); // Adding strokeWidth state
   const [exportedImage, setExportedImage] = useState(drawing_img); // Image for both card and modal
+  const [eraseMode, setEraseMode] = useState(false);
+
   const userID = user_id;
   const sketchRef = useRef(null); // Ref for the canvas
 
@@ -35,11 +38,14 @@ function DrawingPane({
     setValue("body", body);
   }, [body, setValue]);
 
-  const handleCanvasChange = (updatedPaths) => {
-    if (updatedPaths && updatedPaths.length) {
-      setBody(JSON.stringify(updatedPaths)); // Only update if valid paths exist
-    }
-  };
+  const handleCanvasChange = useCallback(
+    debounce((updatedPaths) => {
+      if (updatedPaths && updatedPaths.length) {
+        setBody(JSON.stringify(updatedPaths)); // Update paths
+      }
+    }, 200), // Debounce time of 200ms
+    []
+  );
 
   useEffect(() => {
     setTimeout(() => {
@@ -56,11 +62,27 @@ function DrawingPane({
           console.error("Error parsing initial body:", error);
         }
       }
-    }, 200); // Small delay to ensure the modal and canvas are fully rendered
+    }, 500); // Small delay to ensure the modal and canvas are fully rendered
   }, [isExpanded, initialBody, sketchRef]);
 
+  function debounce(func, delay) {
+    let timeout;
+    return function (...args) {
+      const context = this;
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(context, args), delay);
+    };
+  }
+
   const handleStrokeColor = (color) => {
+    setEraseMode(false); 
     setStrokeColor(color);
+    setStrokeWidth(4); // Set back to normal stroke width when drawing
+  };
+
+  const handleErase = () => {
+    setEraseMode(!eraseMode);
+    sketchRef.current?.eraseMode(eraseMode); 
   };
 
   const onSubmit = async (data) => {
@@ -199,37 +221,42 @@ function DrawingPane({
           <hr className="w-full dark:text-gray-500 text-gray-800 my-2" />
 
           <form onSubmit={handleSubmit(onSubmit)} className="p-4">
-            <div className="flex gap-2 my-2">
-              <button
-                type="button"
-                onClick={() => handleStrokeColor("red")}
-                className="w-4 h-4 rounded-full bg-red-700"
-              ></button>
-              <button
-                type="button"
-                onClick={() => handleStrokeColor("yellow")}
-                className="w-4 h-4 rounded-full bg-yellow-600"
-              ></button>
-              <button
-                type="button"
-                onClick={() => handleStrokeColor("blue")}
-                className="w-4 h-4 rounded-full bg-blue-700"
-              ></button>
-              <button
-                type="button"
-                onClick={() => handleStrokeColor("green")}
-                className="w-4 h-4 rounded-full bg-green-500"
-              ></button>
-              <button
-                type="button"
-                onClick={() => handleStrokeColor("pink")}
-                className="w-4 h-4 rounded-full bg-pink-400"
-              ></button>
-              <button
-                type="button"
-                onClick={() => handleStrokeColor("black")}
-                className="w-4 h-4 rounded-full bg-black"
-              ></button>
+            <div className="flex justify-between">
+              <div className="flex gap-2 my-2">
+                <button
+                  type="button"
+                  onClick={() => handleStrokeColor("red")}
+                  className="w-4 h-4 rounded-full bg-red-700"
+                ></button>
+                <button
+                  type="button"
+                  onClick={() => handleStrokeColor("yellow")}
+                  className="w-4 h-4 rounded-full bg-yellow-600"
+                ></button>
+                <button
+                  type="button"
+                  onClick={() => handleStrokeColor("blue")}
+                  className="w-4 h-4 rounded-full bg-blue-700"
+                ></button>
+                <button
+                  type="button"
+                  onClick={() => handleStrokeColor("green")}
+                  className="w-4 h-4 rounded-full bg-green-500"
+                ></button>
+                <button
+                  type="button"
+                  onClick={() => handleStrokeColor("pink")}
+                  className="w-4 h-4 rounded-full bg-pink-400"
+                ></button>
+                <button
+                  type="button"
+                  onClick={() => handleStrokeColor("black")}
+                  className="w-4 h-4 rounded-full bg-black"
+                ></button>
+              </div>
+              <div className="flex items-center">
+                <h3 className="cursor-pointer" onClick={handleErase}>Erase</h3>
+              </div>
             </div>
 
             <ReactSketchCanvas
@@ -239,8 +266,8 @@ function DrawingPane({
                 width: "100%",
                 height: "300px",
               }}
-              strokeWidth={4}
-              strokeColor={strokeColor}
+              strokeWidth={strokeWidth} // Dynamic stroke width
+              strokeColor={strokeColor} // Dynamic stroke color
               onChange={handleCanvasChange}
             />
 
