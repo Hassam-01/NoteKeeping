@@ -26,10 +26,10 @@ function page() {
     console.log(userID, "user id here")
     
     const Mymeeting = async (element) => {
-        const appID = 550177510;
-        const serverSecret = "733f62ca76f5bb152f18c3ca16608108";
+        const appID = process.env.NEXT_PUBLIC_MEETINGAPPID;
+        const serverSecret = process.env.NEXT_PUBLIC_MEETINGSECRET;
 
-        const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(appID, serverSecret, meetingID, userID.toString(), "hassam")
+        const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(Number(appID), serverSecret, meetingID, userID.toString(), "hassam")
 
         const zp = ZegoUIKitPrebuilt.create(kitToken);
 
